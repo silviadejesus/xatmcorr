@@ -14,10 +14,15 @@ set(LIBS ${LIBS} ${GDAL_LIBRARY})
 find_package(Qt3 REQUIRED) # find and setup Qt3 for this project
 
 add_definitions(${QT_DEFINITIONS})
-#link_directories(${QT_LIB_DIR})
-
 # tell cmake where to search for Qt/KDE headers:
 include_directories(${QT_INCLUDE_DIR})
+
+
+SET(project_UI
+    ui/batchDialog.ui
+)
+# Make ui files from the designer to header files
+QT_WRAP_UI(AtmCorr project_UI_HDRS project_UI_SRCS ${project_UI})
 
 
 
@@ -27,6 +32,6 @@ set(tinyXMLSRCS tinyxml/tinystr.cpp tinyxml/tinyxml.cpp tinyxml/tinyxmlerror.cpp
 
 set(AtmCorr_SRCS src/auxtable.cpp src/main.cpp  src/sensorparam.cpp src/stl.cpp)
 #qt4_automoc(${AtmCorr_SRCS})
-add_executable(AtmCorr ${AtmCorr_SRCS} ${tinyXMLSRCS})
+add_executable(AtmCorr ${AtmCorr_SRCS} ${tinyXMLSRCS} ${SOURCES_UI_H} ${project_UI_SRCS})
 target_link_libraries(AtmCorr ${LIBS} ${QT_LIBRARIES})
 #target_link_libraries(AtmCorr ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY})
