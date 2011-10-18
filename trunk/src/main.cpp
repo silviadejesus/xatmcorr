@@ -3,6 +3,7 @@
 
 #include <qdatetime.h> 
 #include <qprocess.h> 
+#include <qapplication.h>
 
 #include <iostream>
 #include <string>
@@ -16,11 +17,12 @@
 #include "stl.h"
 //#include "gdal.h"
 
+#include "batchDialog.h"
 
 
 
 //TODO Fix Me
-bool write6SFile(SensorParam params, auxTable table, long int npixels, std::string prefix="processing") {
+bool write6SFile(SensorParam params, auxTable table, long int npixels, int atmMode, int continental, double visibility, double heightSeaLevel,std::string prefix="processing") {
     
     std::ofstream outFile;
     outFile.open(prefix.c_str());
@@ -58,6 +60,9 @@ double SunEarthDistanceRatio(int d_n) {
 
 /*! converts tm date to yearly date */
 int dayOfTheYear(tm date) {
+    QDate d1( 1995, 5, 17 );
+    QDate d2( 1985, 5, 20 );  // May 20th 1995
+    print(d1.daysTo( d2 ));          // returns 3
     int day=floor(toJulian(date.tm_mday,date.tm_mon,date.tm_year)-toJulian(01,01,date.tm_year)+1);
     return day;
 }
@@ -69,7 +74,7 @@ double coeficient(double esun, double incidence, tm date) {
 }
 
 //Processes both dn to toa radiance and toa radiance to reflectance
-bool DnToReflectance(const char* filename) {
+bool DnToReflectance(const char* filename, int atmMode, int continental, double visibility, double heightSeaLevel) {
     SensorParam params;
     std::string xmlFilename=filename;
     print("Reading XML metadata.");
@@ -130,7 +135,10 @@ bool DnToReflectance(const char* filename) {
     print("TOA Reflectance file finished.");
     print("Writing atmospheric correction files.");
     
-    write6SFile(params,auxtable, nXSize*nYsize);
+    write6SFile(params,auxtable, nXSize*nYsize,atmMode,continental, visibility, heightSeaLevel);
+    QProcess proc6S;
+    proc6S.addArgument("6S.exe");
+    proc6S.start();
     
     return true;
     //return outMatrix*c*255;
@@ -141,14 +149,26 @@ int main(int argc, char** argv)
 {
     //print(SunEarthDistanceRatio(109));
     bool res=false;
+    int atmMode,continental;
+    double visibility,heightSeaLevel;
     if (argc>1) { //if no parameters were passed, open main window
-        res =DnToReflectance(argv[1]);
+        if (argc>5) {
+            atmMode=atoi(argv[2]);
+            continental=atoi(argv[3]);
+            visibility=atof(argv[4]);
+            heightSeaLevel=atof(argv[5]);
+        }
+        res =DnToReflectance(argv[1],atmMode,continental,visibility,heightSeaLevel);
 //QApplication app(argc, argv);
         //AtmCorr foo;
         //foo.show();
         //return app.exec();
     } else {
-        print("Para executar o programa utilize: AtmCorr.exe nomedoarquivo.tif")
+        QApplication a( argc, argv );
+        batchDialog main;
+        a.setMainWidget( &main );
+        main.show();
+        return a.exec();
         //res=DnToReflectance("C:\Documents and Settings\vatto\Desktop\AtmCorr\LANDSAT_5_TM_19930724_002_066_L2_BAND2.tif");///home/mauriciodev/Projetos/AtmCorr/LANDSAT_5_TM_19930724_002_066_L2_BAND2.tif");
     }
     
@@ -157,7 +177,5 @@ int main(int argc, char** argv)
     } else {
         print("Não foi possível completar o processo.");
     }
-     QDate d1( 1995, 5, 17 );
-     QDate d2( 1985, 5, 20 );  // May 20th 1995
-     print(d1.daysTo( d2 ));          // returns 3
+
 }
