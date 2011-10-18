@@ -11,6 +11,15 @@ set(LIBS ${LIBS} ${GDAL_LIBRARY})
 #include_directories(/usr/include/gdal)
 #link_libraries(/usr/lib)
 
+find_package(Qt3 REQUIRED) # find and setup Qt3 for this project
+
+add_definitions(${QT_DEFINITIONS})
+#link_directories(${QT_LIB_DIR})
+
+# tell cmake where to search for Qt/KDE headers:
+include_directories(${QT_INCLUDE_DIR})
+
+
 
 include_directories( ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/tinyxml ${CMAKE_CURRENT_SOURCE_DIR}/include) # ${QT_INCLUDES})
 
@@ -19,5 +28,5 @@ set(tinyXMLSRCS tinyxml/tinystr.cpp tinyxml/tinyxml.cpp tinyxml/tinyxmlerror.cpp
 set(AtmCorr_SRCS src/auxtable.cpp src/main.cpp  src/sensorparam.cpp src/stl.cpp)
 #qt4_automoc(${AtmCorr_SRCS})
 add_executable(AtmCorr ${AtmCorr_SRCS} ${tinyXMLSRCS})
-target_link_libraries(AtmCorr ${LIBS})
+target_link_libraries(AtmCorr ${LIBS} ${QT_LIBRARIES})
 #target_link_libraries(AtmCorr ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY})
