@@ -41,6 +41,13 @@ bool SensorParam::readFromXml(std::string filename)
         //reading incidence angle
         node = docHandle.FirstChild( "prdf" ).FirstChild("image").FirstChild( "sunPosition" ).FirstChild( "elevation" ).ToElement();
         this->incidenceAngle=atof(node->GetText());
+
+        //reading Latitude
+        node = docHandle.FirstChild( "prdf" ).FirstChild("image").FirstChild( "boundingBox" ).FirstChild( "CT" ).FirstChild( "latitude" ).ToElement();
+        this->centerLat=atof(node->GetText());
+        //reading incidence angle
+        node = docHandle.FirstChild( "prdf" ).FirstChild("image").FirstChild( "boundingBox" ).FirstChild( "CT" ).FirstChild( "longitude" ).ToElement();
+        this->centerLon=atof(node->GetText());
         
     return true;
  /*#incidenceAngletru=sunPosition.elevation
