@@ -17,7 +17,7 @@
 #include "stl.h"
 //#include "gdal.h"
 
-#include "batchDialog.h"
+#include "batchcor.h"
 
 
 
@@ -165,7 +165,7 @@ int main(int argc, char** argv)
         //return app.exec();
     } else {
         QApplication a( argc, argv );
-        batchDialog main;
+        batchCor main;
         a.setMainWidget( &main );
         main.show();
         return a.exec();
