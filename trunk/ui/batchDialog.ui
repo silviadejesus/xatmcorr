@@ -13,7 +13,7 @@
         </rect>
     </property>
     <property name="caption">
-        <string>Correção Atmosférica em lote</string>
+        <string>Correção Atmosférica para múltiplos arquivos</string>
     </property>
     <grid>
         <property name="name">
@@ -45,7 +45,7 @@
                         </sizepolicy>
                     </property>
                     <property name="text">
-                        <string>Abrir</string>
+                        <string>Abrir Pasta</string>
                     </property>
                 </widget>
             </hbox>
@@ -55,58 +55,32 @@
                 <property name="text">
                     <string>Arquivo</string>
                 </property>
-                <property name="pixmap">
-                    <pixmap></pixmap>
-                </property>
             </column>
             <column>
                 <property name="text">
                     <string>Xml</string>
                 </property>
-                <property name="pixmap">
-                    <pixmap></pixmap>
+            </column>
+            <column>
+                <property name="text">
+                    <string>Atmosfera (modelo)</string>
                 </property>
             </column>
             <column>
                 <property name="text">
-                    <string>Geometria</string>
-                </property>
-                <property name="pixmap">
-                    <pixmap></pixmap>
+                    <string>Aerosol (modelo)</string>
                 </property>
             </column>
             <column>
                 <property name="text">
-                    <string>3</string>
-                </property>
-                <property name="pixmap">
-                    <pixmap></pixmap>
+                    <string>Visibilidade (km)</string>
                 </property>
             </column>
             <column>
                 <property name="text">
-                    <string>4</string>
-                </property>
-                <property name="pixmap">
-                    <pixmap></pixmap>
+                    <string>Altitude (km)</string>
                 </property>
             </column>
-            <column>
-                <property name="text">
-                    <string>Altitude</string>
-                </property>
-                <property name="pixmap">
-                    <pixmap></pixmap>
-                </property>
-            </column>
-            <row>
-                <property name="text">
-                    <string>1</string>
-                </property>
-                <property name="pixmap">
-                    <pixmap></pixmap>
-                </property>
-            </row>
             <property name="name">
                 <cstring>table1</cstring>
             </property>
@@ -119,12 +93,28 @@
         </widget>
         <widget class="QLayoutWidget" row="2" column="0">
             <property name="name">
-                <cstring>layout2</cstring>
+                <cstring>layout3</cstring>
             </property>
             <hbox>
                 <property name="name">
                     <cstring>unnamed</cstring>
                 </property>
+                <widget class="QPushButton">
+                    <property name="name">
+                        <cstring>pushButton4</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Salvar tabela</string>
+                    </property>
+                </widget>
+                <widget class="QPushButton">
+                    <property name="name">
+                        <cstring>pushButton5</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Carregar tabela</string>
+                    </property>
+                </widget>
                 <spacer>
                     <property name="name">
                         <cstring>spacer1</cstring>
@@ -137,11 +127,19 @@
                     </property>
                     <property name="sizeHint">
                         <size>
-                            <width>40</width>
+                            <width>200</width>
                             <height>20</height>
                         </size>
                     </property>
                 </spacer>
+                <widget class="QPushButton">
+                    <property name="name">
+                        <cstring>pushButton5_2</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Ajuda</string>
+                    </property>
+                </widget>
                 <widget class="QPushButton">
                     <property name="name">
                         <cstring>pushButton2</cstring>
@@ -155,16 +153,51 @@
                         </sizepolicy>
                     </property>
                     <property name="text">
-                        <string>Executar</string>
+                        <string>Processar Imagens</string>
                     </property>
                 </widget>
             </hbox>
         </widget>
     </grid>
 </widget>
+<connections>
+    <connection>
+        <sender>pushButton1</sender>
+        <signal>clicked()</signal>
+        <receiver>batchDialog</receiver>
+        <slot>chooseDir()</slot>
+    </connection>
+    <connection>
+        <sender>pushButton2</sender>
+        <signal>clicked()</signal>
+        <receiver>batchDialog</receiver>
+        <slot>run()</slot>
+    </connection>
+    <connection>
+        <sender>pushButton4</sender>
+        <signal>clicked()</signal>
+        <receiver>batchDialog</receiver>
+        <slot>saveTable()</slot>
+    </connection>
+    <connection>
+        <sender>pushButton5</sender>
+        <signal>clicked()</signal>
+        <receiver>batchDialog</receiver>
+        <slot>openTable()</slot>
+    </connection>
+    <connection>
+        <sender>pushButton5_2</sender>
+        <signal>clicked()</signal>
+        <receiver>batchDialog</receiver>
+        <slot>help()</slot>
+    </connection>
+</connections>
 <slots>
-    <slot>listFiles()</slot>
+    <slot>openTable()</slot>
+    <slot>saveTable()</slot>
+    <slot>help()</slot>
     <slot>run()</slot>
+    <slot>chooseDir()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>
