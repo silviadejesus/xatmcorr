@@ -1,3 +1,6 @@
+#ifndef SENSORPARAM_H
+#define SENSORPARAM_H
+
 #include <string>
 #include <ctime>
 #include <iostream>
@@ -20,3 +23,5 @@ class SensorParam {
         }
         void setTimeStamp(std::string timeStamp);
 };
+
+#endif
