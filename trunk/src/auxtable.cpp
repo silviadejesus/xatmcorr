@@ -52,7 +52,8 @@ bool auxTable::readAuxTable(const char*  bandNumber, const char*  sensor, const 
                 }
             }
         }
-        myfile.close();
+        
     }
-	return true;
+    myfile.close();
+    return true;
 }
