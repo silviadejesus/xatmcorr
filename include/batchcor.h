@@ -9,6 +9,7 @@
 #include "qfileinfo.h"
 #include "qprocess.h"
 
+#include "dntotoa.h"
 
 
 class batchCor: public batchDialog{
