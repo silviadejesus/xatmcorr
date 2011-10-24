@@ -23,12 +23,12 @@ set(tinyXMLSRCS tinyxml/tinystr.cpp tinyxml/tinyxml.cpp tinyxml/tinyxmlerror.cpp
 
 set(Ui_Implem include/batchcor.h)
 
-set(AtmCorr_SRCS src/auxtable.cpp src/main.cpp  src/sensorparam.cpp src/stl.cpp  src/batchcor.cpp)
+set(AtmCorr_SRCS src/auxtable.cpp src/main.cpp  src/sensorparam.cpp src/stl.cpp  src/batchcor.cpp src/dntotoa.cpp)
 
 
 # Make ui files from the designer to header files
 QT_WRAP_UI(AtmCorr project_UI_HDRS project_UI_SRCS ${project_UI})
-QT_WRAP_CPP(AtmCorr project_UI_CPP ${Ui_Implem} )
+QT_WRAP_CPP(AtmCorr project_UI_MOC ${Ui_Implem} )
 
 #SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
 #SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin) 
@@ -39,6 +39,6 @@ include_directories(${QT_INCLUDE_DIR})
 
 #kde3_automoc(AtmCorr_SRCS)
 
-add_executable(AtmCorr ${AtmCorr_SRCS} ${tinyXMLSRCS}  ${project_UI_CPP} ${project_UI_SRCS})
+add_executable(AtmCorr ${AtmCorr_SRCS} ${tinyXMLSRCS}  ${project_UI_MOC} ${project_UI_SRCS})
 target_link_libraries(AtmCorr ${LIBS} ${QT_LIBRARIES})
 #target_link_libraries(AtmCorr ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY})
