@@ -8,22 +8,22 @@
 
 #include "qdatetime.h"
 #include "qprocess.h"
-
+#include "qurloperator.h" 
 
 class DnToToa {
 public:
-    DnToToa();
+    DnToToa(const char * homePath);
     ~DnToToa();
     bool DnToReflectance(const char* filename, int atmMode, int continental, double visibility, double heightSeaLevel, const char *toaFileName="");
     bool Correction6S(const char * filename, const char * inpFileName, const char *surfFileName);
-    bool CleanUp();
+    bool CleanUp(const char *path, const char * filename, const char * inpFileName, const char *surfFileName);
 private:
     double d2r(double degree);
     double SunEarthDistanceRatio(int d_n);
     int dayOfTheYear(tm date);
     double coeficient(double esun, double incidence, tm date);
     bool write6SFile(SensorParam params, auxTable table, long int npixels, int atmMode, int continental, double visibility, double heightSeaLevel,std::string prefix="processing");
-    
+    std::string homePath;
     
     
 };
