@@ -35,7 +35,7 @@ int main(int argc, char** argv)
         }
         DnToToa tool1(a.applicationDirPath().ascii());
         res =tool1.DnToReflectance(argv[1],atmMode,continental,visibility,heightSeaLevel);
-//QApplication app(argc, argv);
+        //QApplication app(argc, argv);
         //AtmCorr foo;
         //foo.show();
         //return app.exec();

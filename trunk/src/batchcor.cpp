@@ -27,7 +27,7 @@ void batchCor::run() {
         
         //moves to the directory where the file is
         QFileInfo fInfo(filename);
-        std::string local=fInfo.dirPath().ascii();
+        std::string local=fInfo.dirPath();
         QDir::setCurrent(local);
         filename=fInfo.fileName().ascii();
         //transform to reflectance TOA
@@ -43,9 +43,10 @@ void batchCor::run() {
         
         //convert to tiff and erase files;
         oneImageProcess.CleanUp(local.c_str(), toaFileName.c_str(),inpFileName.c_str(),surfFileName.c_str());
-        //delete proc;
     }
-    
+    QMessageBox::information( this, "XML Atmospheric Correction",
+    "Process finished.\n"
+    "BRASIL!" );
 
     
 }
@@ -114,7 +115,7 @@ void batchCor::chooseDir() {
             QString xmlFile=tiffFiles[i];
             xmlFile.replace(".tif",".xml");
             if (filesDir.exists(xmlFile)) {
-                table1->setText(i,1,"Ok");
+                table1->setText(i,1,"Encontrado");
             } else {
                 table1->setText(i,1,"Nao encontrado");
             }
