@@ -108,7 +108,7 @@ bool DnToToa::DnToReflectance(const char* filename, int atmMode, int continental
             newval=c*(a*(pafScanline[i]-auxtable.dnMin) + auxtable.lmin);
 
             //if (newval<0) newval=0;
-            pafWriteline[i]=char(round(newval*255));
+            pafWriteline[i]=char(newval*255);
         }
         poOutBand->RasterIO( GF_Write, 0, j, nXSize, 1,pafWriteline, nXSize, 1, GDT_Byte,0, 0 );
     }
@@ -145,7 +145,7 @@ bool DnToToa::Correction6S(const char * filename, const char * inpFileName, cons
     
     QProcess proc6S;
     print("Processing atmospheric correction");
-    proc6S.addArgument("wineconsole");
+    //proc6S.addArgument("wineconsole");
     proc6S.addArgument(path6s.c_str());
     proc6S.start();
     while (proc6S.isRunning ()) {
@@ -178,7 +178,7 @@ bool DnToToa::CleanUp(const char * path, const char * filename, const char * inp
     headerPath+=".hdr";
     newHeader+=surfFileName;
     newHeader+=".hdr";
-    print(headerPath<< " e " <<newHeader);
+    //print(headerPath<< " e " <<newHeader);
     
     //copying the headers
     QFile source(headerPath);
@@ -193,5 +193,5 @@ bool DnToToa::CleanUp(const char * path, const char * filename, const char * inp
     writeStream<<a;
     source.close();
     dest.close();
-
+	return true;
 }
