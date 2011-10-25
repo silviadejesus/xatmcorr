@@ -34,7 +34,7 @@ public:
     tm dateMin, dateMax;
     
     auxTable();
-    bool readAuxTable(const char*  bandNumber, const char*  sensor,const char* satellite, tm timeStamp);
+    bool readAuxTable(const char*  bandNumber, const char*  sensor,const char* satellite, tm timeStamp,const char * csvPath);
     //res={lmin:0,lmax:0,esun:0,id6s:0, dnMin:1, dnMax:255}
     //return res
 };
