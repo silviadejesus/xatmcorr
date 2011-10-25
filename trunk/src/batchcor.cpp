@@ -1,7 +1,7 @@
 #include "batchcor.h"
 
-batchCor::batchCor( QWidget* parent, const char* name, bool modal, WFlags fl ):batchDialog(parent, name, modal, fl) {
-
+batchCor::batchCor( const char * homePath, QWidget* parent, const char* name, bool modal, WFlags fl ):batchDialog(parent, name, modal, fl) {
+    this->homePath=homePath;
 }
 
 
@@ -14,7 +14,7 @@ void batchCor::run() {
     std::string filename, toaFileName, surfFileName,inpFileName;
     
     //QProcess *proc;
-    DnToToa oneImageProcess;//=new DnToToa();
+    DnToToa oneImageProcess(this->homePath.c_str());//=new DnToToa();
     int i;
     for (i=0; i<this->table1->numRows();i++) {
         std::cout<<i<<this->table1->numRows()<<std::endl;
@@ -25,6 +25,11 @@ void batchCor::run() {
         filename=this->table1->text(i,0).ascii();
         
         
+        //moves to the directory where the file is
+        QFileInfo fInfo(filename);
+        std::string local=fInfo.dirPath();
+        QDir::setCurrent(local);
+        filename=fInfo.fileName().ascii();
         //transform to reflectance TOA
         toaFileName=filename;
         toaFileName.replace(filename.find("."),4,"-toa");
@@ -35,8 +40,9 @@ void batchCor::run() {
         inpFileName.replace(filename.find("."),4,".inp");
         //transform to reflectance Sup
         oneImageProcess.Correction6S(toaFileName.c_str(),inpFileName.c_str(),surfFileName.c_str());
-        //convert to tiff
         
+        //convert to tiff and erase files;
+        oneImageProcess.CleanUp(local.c_str(), toaFileName.c_str(),inpFileName.c_str(),surfFileName.c_str());
         //delete proc;
     }
     
@@ -91,18 +97,23 @@ void batchCor::saveTable() {
 
 void batchCor::chooseDir() {
     //QString fileFilters = tr("Comma-separated values files (*.csv)\n");
+    if (this->lineEdit1->text()=="") this->lineEdit1->setText(QDir::currentDirPath());
     QString dir =QFileDialog::getExistingDirectory(this->lineEdit1->text(),this);
     //QString fileName = QFileDialog::getOpenFileName(".", fileFilters, this);
     
     if (!dir.isEmpty()) {
+        QDir filesDir(dir);
+        //list files in the directory
+        QStringList tiffFiles = filesDir.entryList ("*.tif");
         lineEdit1->setText(dir);
-        QStringList tiffFiles;
-        listDir(dir,tiffFiles);
+        
+        //fills the table
         table1->setNumRows(tiffFiles.size());
-        for ( int i=0;i<tiffFiles.size();i++ ) {
-            table1->setText(i,0,tiffFiles[i]);
-            QFileInfo file(dir,tiffFiles[i].replace(".tif",".xml"));
-            if (file.exists()) {
+        for ( unsigned int i=0;i<tiffFiles.size();i++ ) {
+            table1->setText(i,0,filesDir.absFilePath(tiffFiles[i]));
+            QString xmlFile=tiffFiles[i];
+            xmlFile.replace(".tif",".xml");
+            if (filesDir.exists(xmlFile)) {
                 table1->setText(i,1,"Ok");
             } else {
                 table1->setText(i,1,"Nao encontrado");
@@ -111,8 +122,4 @@ void batchCor::chooseDir() {
     }
 }
 
-void batchCor::listDir(QString dir, QStringList &tiffList) {
-    QDir myDir(dir);
-    tiffList = myDir.entryList ("*.tif");     // filter only c++ files
-}
 

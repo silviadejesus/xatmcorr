@@ -25,9 +25,9 @@ auxTable::auxTable() {
     
 }
 
-bool auxTable::readAuxTable(const char*  bandNumber, const char*  sensor, const char* satellite, tm timeStamp) {
+bool auxTable::readAuxTable(const char*  bandNumber, const char*  sensor, const char* satellite, tm timeStamp, const char *csvPath) {
     std::string line;
-    std::ifstream myfile("radiancia.csv");
+    std::ifstream myfile(csvPath);
     if (myfile.is_open()) {
         while (! myfile.eof() ) {
             getline (myfile,line);
@@ -53,6 +53,8 @@ bool auxTable::readAuxTable(const char*  bandNumber, const char*  sensor, const 
             }
         }
         
+    } else {
+        print("radiancia.csv not found.");
     }
     myfile.close();
     return true;

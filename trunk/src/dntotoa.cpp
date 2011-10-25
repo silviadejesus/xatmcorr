@@ -1,7 +1,7 @@
 #include "dntotoa.h"
 
-DnToToa::DnToToa() {
-    
+DnToToa::DnToToa(const char * homePath) {
+    this->homePath=homePath;
 }
 DnToToa::~DnToToa() {
     
@@ -45,11 +45,8 @@ double DnToToa::SunEarthDistanceRatio(int d_n) {
 
 /*! converts tm date to yearly date */
 int DnToToa::dayOfTheYear(tm date) {
-    QDate d1( 1995, 5, 17 );
-    QDate d2( 1985, 5, 20 );  // May 20th 1995
-    print(d1.daysTo( d2 ));          // returns 3
-    int day=floor(toJulian(date.tm_mday,date.tm_mon,date.tm_year)-toJulian(01,01,date.tm_year)+1);
-    return day;
+    QDate d1( date.tm_year, date.tm_mon, date.tm_mday );
+    return d1.dayOfYear();;
 }
 
 double DnToToa::coeficient(double esun, double incidence, tm date) {
@@ -67,7 +64,9 @@ bool DnToToa::DnToReflectance(const char* filename, int atmMode, int continental
     params.readFromXml(xmlFilename);
     print("Reading sensor parameters");
     auxTable auxtable;
-    auxtable.readAuxTable(params.bandNumber.c_str(), params.sensorName.c_str(),params.satellite.c_str(),params.timeStamp);
+    std::string csvPath=this->homePath+"/radiancia.csv";
+    print(csvPath);
+    auxtable.readAuxTable(params.bandNumber.c_str(), params.sensorName.c_str(),params.satellite.c_str(),params.timeStamp,csvPath.c_str());
     //can't the incidence angle be computed also?
     double c=coeficient(auxtable.esun,params.incidenceAngle,params.timeStamp);
     //print(c);
@@ -84,6 +83,7 @@ bool DnToToa::DnToReflectance(const char* filename, int atmMode, int continental
     int nXSize = poBand->GetXSize();
     int nYsize = poBand->GetYSize();
     float *pafScanline = (float *) CPLMalloc(sizeof(float)*nXSize);
+    char *pafWriteline = (char *) CPLMalloc(sizeof(char)*nXSize);
 
     print("Opening input and output files.");
     //creating output file
@@ -91,7 +91,7 @@ bool DnToToa::DnToReflectance(const char* filename, int atmMode, int continental
     GDALDriver * poDriver=GetGDALDriverManager()->GetDriverByName("ENVI");
     char ** options= NULL;
     //options=CSLSetNameValue(options,"SUFFIX","ADD");
-    GDALDataset * poDstDS=poDriver->Create(toaFileName,nXSize,nYsize,1,GDT_Float32, NULL);
+    GDALDataset * poDstDS=poDriver->Create(toaFileName,nXSize,nYsize,1,GDT_Byte, NULL);
     double * geotransform= new double[6];
     poDataset->GetGeoTransform(geotransform);
     poDstDS->SetGeoTransform(geotransform);
@@ -108,9 +108,9 @@ bool DnToToa::DnToReflectance(const char* filename, int atmMode, int continental
             newval=c*(a*(pafScanline[i]-auxtable.dnMin) + auxtable.lmin);
 
             //if (newval<0) newval=0;
-            pafScanline[i]=newval*255;
+            pafWriteline[i]=char(round(newval*255));
         }
-        poOutBand->RasterIO( GF_Write, 0, j, nXSize, 1,pafScanline, nXSize, 1, GDT_Float32,0, 0 );
+        poOutBand->RasterIO( GF_Write, 0, j, nXSize, 1,pafWriteline, nXSize, 1, GDT_Byte,0, 0 );
     }
     GDALClose(poDstDS);
     GDALClose(poDataset);
@@ -127,9 +127,16 @@ bool DnToToa::DnToReflectance(const char* filename, int atmMode, int continental
 }
 
 bool DnToToa::Correction6S(const char * filename, const char * inpFileName, const char *surfFileName) {
+
+    
+    //path to where the 6S program is
+    std::string path6s=this->homePath+QDir::separator();
+    path6s+="6S";
+    path6s+=QDir::separator();
+    path6s+="6S_ATMS_CORR.EXE";
+    
     //prepare INPFILES.TXT
     std::ofstream inpfiles("INPFILES.TXT");
-    
     inpfiles<<inpFileName<<std::endl;
     inpfiles<<"nothing.res"<<std::endl;
     inpfiles<<filename<<std::endl;
@@ -137,11 +144,54 @@ bool DnToToa::Correction6S(const char * filename, const char * inpFileName, cons
     inpfiles.close();
     
     QProcess proc6S;
+    print("Processing atmospheric correction");
     proc6S.addArgument("wineconsole");
-    proc6S.addArgument("6S/6S_ATMS_CORR.EXE");
+    proc6S.addArgument(path6s.c_str());
     proc6S.start();
     while (proc6S.isRunning ()) {
-        //nothing
+        //wait
     }
+    print("Done.")
     return true;
+}
+
+
+/*!Copies ENVI header and erases temporary file.*/
+bool DnToToa::CleanUp(const char * path, const char * filename, const char * inpFileName, const char *surfFileName) {
+    QDir dirPath(path);
+
+    std::string curFile;//="file:";
+    curFile+=path;
+    curFile+=QDir::separator();
+    //erasing .inp
+    std::string inpPath=curFile+inpFileName;
+    dirPath.remove(inpPath.c_str());
+    
+    //erasing INPFILES.TXT
+    std::string inpfilesPath=curFile+"INPFILES.TXT";
+    dirPath.remove(inpfilesPath.c_str());
+    
+    //copying the toa's header to surf
+    std::string headerPath=curFile;
+    std::string newHeader=headerPath;
+    headerPath+=filename;
+    headerPath+=".hdr";
+    newHeader+=surfFileName;
+    newHeader+=".hdr";
+    print(headerPath<< " e " <<newHeader);
+    
+    //copying the headers
+    QFile source(headerPath);
+    QFile dest(newHeader);
+    source.open(IO_ReadOnly);
+    dest.open(IO_WriteOnly);
+    QByteArray a;
+    //open the files with the right IO flags
+    QDataStream readStream(&source);
+    QDataStream writeStream(&dest);
+    readStream>>a;
+    writeStream<<a;
+    source.close();
+    dest.close();
+
 }
