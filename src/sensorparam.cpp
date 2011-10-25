@@ -1,9 +1,20 @@
 #include "sensorparam.h"
 
-void SensorParam::setTimeStamp(std::string timeStamp)
-{
-
-
+void SensorParam::setTimeStamp(std::string strDate) {
+    vector<string> pieces,pieces2,pieces3;
+    StringToVector(strDate,pieces,"-");
+    this->timeStamp.setDate(QDate( atoi(pieces[0].c_str()) ,  atoi(pieces[1].c_str())  , atoi(pieces[2].c_str())));
+    int pos=strDate.find("T");
+    if (pos>0) {
+        StringToVector(strDate,pieces2,"T");
+        string t=pieces2[1];
+        StringToVector(t,pieces3,":");
+        this->timeStamp.setTime(QTime(atoi(pieces3[0].c_str()),atoi(pieces3[1].c_str()),atoi(pieces3[2].c_str())));
+        
+    } else {
+        this->timeStamp.setTime(QTime(0,0,0));
+    }
+    print(this->timeStamp.toString());
 }
 
 
@@ -36,7 +47,9 @@ bool SensorParam::readFromXml(std::string filename)
         //reading timestamp
         node = docHandle.FirstChild( "prdf" ).FirstChild("image").FirstChild( "timeStamp" ).FirstChild( "center" ).ToElement();
         std::string time=node->GetText();
-        this->timeStamp=StrToDate(time);
+        
+        this->setTimeStamp(time);
+        //print(this->timeStamp.toString());
         
         //reading incidence angle
         node = docHandle.FirstChild( "prdf" ).FirstChild("image").FirstChild( "sunPosition" ).FirstChild( "elevation" ).ToElement();

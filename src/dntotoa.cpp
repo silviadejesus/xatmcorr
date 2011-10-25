@@ -16,8 +16,8 @@ bool DnToToa::write6SFile(SensorParam params, auxTable table, long int npixels, 
     outFile.precision(2);
     if (outFile.is_open()) {
         outFile << table.geometry<<"                            (Landsat TM geometrical conditions)"<<endl;
-        double hour=params.timeStamp.tm_hour+params.timeStamp.tm_min/60. +params.timeStamp.tm_sec/3600;
-        outFile <<params.timeStamp.tm_mon <<" "<<  params.timeStamp.tm_mday <<" "<< hour << " "<< params.centerLon << " "<<  params.centerLat <<"    (month,day,hh.ddd,long.,lat.) (hh.ddd=the decimal hour in universal time)"<<endl;
+        double hour=params.timeStamp.time().hour()+params.timeStamp.time().minute()/60. +params.timeStamp.time().second()/3600;
+        outFile <<params.timeStamp.date().month() <<" "<<  params.timeStamp.date().day() <<" "<< hour << " "<< params.centerLon << " "<<  params.centerLat <<"    (month,day,hh.ddd,long.,lat.) (hh.ddd=the decimal hour in universal time)"<<endl;
         outFile <<"1                            (tropical atmospheric mode)"<<endl;
         outFile <<"6                            (continental)"<<endl;
         outFile <<"25                           (visibility in km (aerosol model concentration)"<<endl;
@@ -36,12 +36,37 @@ double DnToToa::d2r(double degree) {
     return degree*pi/180 ;
 }
 
+/** Sun earth-distance ratio computation. */
 double DnToToa::SunEarthDistanceRatio(int d_n) {
     double t=(2*pi* (d_n - 1) / 365);
     double E_0=(1.000110+ 0.034221*cos(t) + 0.001280*sin(t) + 0.000719*cos(2*t) + 0.000077*sin(2*t));
     return sqrt(1/E_0);
 }
 
+/** */
+double DnToToa::angularTime(QTime time) {
+    QTime midday(12,0,0);
+    int seconds=midday.secsTo(time);
+    double decTime=seconds/3600.;
+    
+    return (decTime*pi/12);
+}
+
+/**Computes the solar incidence in a given latitude at the given time*/
+double DnToToa::solarIncidence(double lat, QDateTime timeStamp) {
+    double delta=this->getSunDeclination(timeStamp.date());
+    double omega=this->angularTime(timeStamp.time());
+    lat*=pi/180;
+    double zenital=acos(sin(delta)*sin(lat) +cos(delta)*cos(lat)*cos(omega));
+    return (pi/2-zenital);
+    //return d2r(42.4467);
+}
+/** Sun's declination computation */
+double DnToToa::getSunDeclination(QDate date) {
+    int dJul=-1*date.daysTo(QDate(date.year(),1,1));
+    double declination=23.45*sin((dJul+284)*360/365*pi/180)*pi/180;
+    return declination;
+}
 
 /*! converts tm date to yearly date */
 int DnToToa::dayOfTheYear(tm date) {
@@ -49,10 +74,10 @@ int DnToToa::dayOfTheYear(tm date) {
     return d1.dayOfYear();;
 }
 
-double DnToToa::coeficient(double esun, double incidence, tm date) {
-    int jul=dayOfTheYear(date);
+double DnToToa::coeficient(double esun, double incidence, QDate date) {
+    int jul=date.dayOfYear();//dayOfTheYear(date);
     double d=SunEarthDistanceRatio(jul);
-    return pi*d*d/(esun*sin(d2r(incidence)));
+    return pi*d*d/(esun*sin(incidence));
 }
 
 //Processes both dn to toa radiance and toa radiance to reflectance
@@ -68,11 +93,13 @@ bool DnToToa::DnToReflectance(const char* filename, int atmMode, int continental
     print(csvPath);
     auxtable.readAuxTable(params.bandNumber.c_str(), params.sensorName.c_str(),params.satellite.c_str(),params.timeStamp,csvPath.c_str());
     //can't the incidence angle be computed also?
-    double c=coeficient(auxtable.esun,params.incidenceAngle,params.timeStamp);
+    double incidence=this->solarIncidence(params.centerLat,params.timeStamp);
+    print(incidence*180/pi<< " "<< params.incidenceAngle);
+    double c=coeficient(auxtable.esun,incidence,params.timeStamp.date());
     //print(c);
     double a=(auxtable.lmax-auxtable.lmin)/(auxtable.dnMax-auxtable.dnMin);
 
-
+  
     //reading  the matrix
 
     GDALAllRegister();
@@ -82,16 +109,18 @@ bool DnToToa::DnToReflectance(const char* filename, int atmMode, int continental
     if( poBand == NULL ) return false;
     int nXSize = poBand->GetXSize();
     int nYsize = poBand->GetYSize();
+
     float *pafScanline = (float *) CPLMalloc(sizeof(float)*nXSize);
     char *pafWriteline = (char *) CPLMalloc(sizeof(char)*nXSize);
 
     print("Opening input and output files.");
     //creating output file
-    
     GDALDriver * poDriver=GetGDALDriverManager()->GetDriverByName("ENVI");
     char ** options= NULL;
     //options=CSLSetNameValue(options,"SUFFIX","ADD");
     GDALDataset * poDstDS=poDriver->Create(toaFileName,nXSize,nYsize,1,GDT_Byte, NULL);
+
+    //copying geographic header
     double * geotransform= new double[6];
     poDataset->GetGeoTransform(geotransform);
     poDstDS->SetGeoTransform(geotransform);
@@ -99,6 +128,8 @@ bool DnToToa::DnToReflectance(const char* filename, int atmMode, int continental
     poDstDS->SetProjection(poDataset->GetProjectionRef());
     GDALRasterBand * poOutBand=poDstDS->GetRasterBand(1);
     float newval;
+    
+    //performing the transformation from DN to Top Of Atmosphere
     print("Computing Reflectance Top of Atmosphere.");
     for (int j=0;j<nYsize;j++) {
         poBand->RasterIO( GF_Read, 0, j, nXSize, 1,pafScanline, nXSize, 1, GDT_Float32,0, 0 );
@@ -108,16 +139,16 @@ bool DnToToa::DnToReflectance(const char* filename, int atmMode, int continental
             newval=c*(a*(pafScanline[i]-auxtable.dnMin) + auxtable.lmin);
 
             //if (newval<0) newval=0;
-            pafWriteline[i]=char(newval*255);
+            pafWriteline[i]=char(round(newval*255));
         }
         poOutBand->RasterIO( GF_Write, 0, j, nXSize, 1,pafWriteline, nXSize, 1, GDT_Byte,0, 0 );
     }
     GDALClose(poDstDS);
     GDALClose(poDataset);
     print("TOA Reflectance file finished.");
+
     print("Writing atmospheric correction files.");
-    
-    
+        
     std::string inpFileName=filename;
     inpFileName.replace(inpFileName.find(".tif"),4,".inp");
     write6SFile(params,auxtable, nXSize*nYsize,atmMode,continental, visibility, heightSeaLevel,inpFileName.c_str());
@@ -145,7 +176,7 @@ bool DnToToa::Correction6S(const char * filename, const char * inpFileName, cons
     
     QProcess proc6S;
     print("Processing atmospheric correction");
-    //proc6S.addArgument("wineconsole");
+    proc6S.addArgument("wineconsole");
     proc6S.addArgument(path6s.c_str());
     proc6S.start();
     while (proc6S.isRunning ()) {
@@ -155,6 +186,21 @@ bool DnToToa::Correction6S(const char * filename, const char * inpFileName, cons
     return true;
 }
 
+/** text file copy */
+bool DnToToa::copyHeaders (const char * headerPath, const char * newHeader) {
+    ifstream source(headerPath);
+    ofstream dest(newHeader);
+    std::string line;
+    if (source.is_open() && dest.is_open()) {
+        while (! source.eof() ) {
+            getline (source,line);
+            dest<<line<<std::endl;
+        }
+    }
+    source.close();
+    dest.close();
+    return true;
+}
 
 /*!Copies ENVI header and erases temporary file.*/
 bool DnToToa::CleanUp(const char * path, const char * filename, const char * inpFileName, const char *surfFileName) {
@@ -165,7 +211,7 @@ bool DnToToa::CleanUp(const char * path, const char * filename, const char * inp
     curFile+=QDir::separator();
     //erasing .inp
     std::string inpPath=curFile+inpFileName;
-    dirPath.remove(inpPath.c_str());
+    //dirPath.remove(inpPath.c_str());
     
     //erasing INPFILES.TXT
     std::string inpfilesPath=curFile+"INPFILES.TXT";
@@ -178,20 +224,9 @@ bool DnToToa::CleanUp(const char * path, const char * filename, const char * inp
     headerPath+=".hdr";
     newHeader+=surfFileName;
     newHeader+=".hdr";
-    //print(headerPath<< " e " <<newHeader);
+    print(headerPath<< " e " <<newHeader);
     
     //copying the headers
-    QFile source(headerPath);
-    QFile dest(newHeader);
-    source.open(IO_ReadOnly);
-    dest.open(IO_WriteOnly);
-    QByteArray a;
-    //open the files with the right IO flags
-    QDataStream readStream(&source);
-    QDataStream writeStream(&dest);
-    readStream>>a;
-    writeStream<<a;
-    source.close();
-    dest.close();
-	return true;
+    this->copyHeaders(headerPath.c_str(),newHeader.c_str());
+
 }

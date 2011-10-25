@@ -25,7 +25,7 @@ auxTable::auxTable() {
     
 }
 
-bool auxTable::readAuxTable(const char*  bandNumber, const char*  sensor, const char* satellite, tm timeStamp, const char *csvPath) {
+bool auxTable::readAuxTable(const char*  bandNumber, const char*  sensor, const char* satellite, QDateTime timeStamp, const char *csvPath) {
     std::string line;
     std::ifstream myfile(csvPath);
     if (myfile.is_open()) {
@@ -42,10 +42,17 @@ bool auxTable::readAuxTable(const char*  bandNumber, const char*  sensor, const 
                     this->dnMin=StrToFloat(params[7]);
                     this->dnMax=StrToFloat(params[8]);
                     this->geometry=atoi(params[9].c_str());
-                    this->dateMin=StrToDate(params[10]);
-                    this->dateMax=StrToDate(params[11]);
-                    if ((toJulian(this->dateMin)<toJulian(timeStamp)) && (toJulian(this->dateMax)>toJulian(timeStamp)) ) {
+                    
+                    vector<string> pieces,pieces2;
+                    StringToVector(params[10],pieces,"-");
+                    this->dateMin=QDate( atoi(pieces[0].c_str()) ,   atoi(pieces[1].c_str()) , atoi(pieces[2].c_str()));
+                   
+                    StringToVector(params[11],pieces2,"-");
+                    this->dateMax=QDate( atoi(pieces2[0].c_str()) ,   atoi(pieces2[1].c_str()) , atoi(pieces2[2].c_str()));
+                    print((this->dateMin<timeStamp.date()) <<" "<< (this->dateMax>timeStamp.date()));
+                    if ((this->dateMin<timeStamp.date()) && (this->dateMax>timeStamp.date()) ) {
                         std::cout<<satellite<<" "<<sensor <<" "<<bandNumber <<" "<<params[10]<<" "<<params[11]<<std::endl;
+                        myfile.close();
                         return true;
                     }
                     //std::cout<<line<<std::endl;
@@ -57,5 +64,5 @@ bool auxTable::readAuxTable(const char*  bandNumber, const char*  sensor, const 
         print("radiancia.csv not found.");
     }
     myfile.close();
-    return true;
+    return false;
 }
