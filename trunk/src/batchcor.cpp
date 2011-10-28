@@ -4,7 +4,9 @@ batchCor::batchCor( const char * homePath, QWidget* parent, const char* name, bo
     this->homePath=homePath;
 }
 
-
+void batchCor::print(const char* text) {
+    //this->
+}
 
 void batchCor::run() {
     int atmMode, continental;
@@ -21,7 +23,7 @@ void batchCor::run() {
         atmMode=this->table1->text(i,2).toInt();
         continental=this->table1->text(i,3).toInt();
         visibility=this->table1->text(i,4).toDouble();
-        heightSeaLevel=this->table1->text(i,5).toDouble();
+        heightSeaLevel=this->table1->text(i,5).toDouble()*-0.001;
         filename=this->table1->text(i,0).ascii();
         
         
