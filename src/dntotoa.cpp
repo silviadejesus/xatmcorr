@@ -139,7 +139,7 @@ bool DnToToa::DnToReflectance(const char* filename, int atmMode, int continental
             newval=c*(a*(pafScanline[i]-auxtable.dnMin) + auxtable.lmin);
 
             //if (newval<0) newval=0;
-            pafWriteline[i]=char(round(newval*255));
+            pafWriteline[i]=char(floor(newval*255));
         }
         poOutBand->RasterIO( GF_Write, 0, j, nXSize, 1,pafWriteline, nXSize, 1, GDT_Byte,0, 0 );
     }

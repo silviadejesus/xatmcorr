@@ -28,7 +28,7 @@ void batchCor::run() {
         
         
         //moves to the directory where the file is
-        QFileInfo fInfo(filename);
+        QFileInfo fInfo(filename;c_str());
         std::string local=fInfo.dirPath();
         QDir::setCurrent(local);
         filename=fInfo.fileName().ascii();
