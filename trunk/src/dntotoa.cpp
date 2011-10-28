@@ -228,5 +228,5 @@ bool DnToToa::CleanUp(const char * path, const char * filename, const char * inp
     
     //copying the headers
     this->copyHeaders(headerPath.c_str(),newHeader.c_str());
-
+    return true;
 }
