@@ -4,7 +4,7 @@ batchCor::batchCor( const char * homePath, QWidget* parent, const char* name, bo
     this->homePath=homePath;
 }
 
-void batchCor::print(const char* text) {
+void batchCor::printText(const char* text) {
     //this->
 }
 

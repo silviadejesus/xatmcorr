@@ -48,7 +48,7 @@ int main(int argc, char** argv)
         //res=DnToReflectance("C:\Documents and Settings\vatto\Desktop\AtmCorr\LANDSAT_5_TM_19930724_002_066_L2_BAND2.tif");///home/mauriciodev/Projetos/AtmCorr/LANDSAT_5_TM_19930724_002_066_L2_BAND2.tif");
     }
      
-    if (res) {
+    if (!res) {
         print("Terminado.");
     } else {
         print("Não foi possível completar o processo.");
