@@ -18,6 +18,7 @@ class batchCor: public batchDialog{
 public:
     batchCor(const char * homePath, QWidget* parent = 0, const char* name = 0,
                     bool modal = FALSE, WFlags fl = 0 );
+    
 private:
     std::string homePath;
 public slots:
@@ -26,6 +27,6 @@ public slots:
     void saveTable();
     void openTable();
     void chooseDir();
-    
+    void printText(const char* text);
     
 };
