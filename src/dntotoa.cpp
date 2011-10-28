@@ -18,10 +18,10 @@ bool DnToToa::write6SFile(SensorParam params, auxTable table, long int npixels, 
         outFile << table.geometry<<"                            (Landsat TM geometrical conditions)"<<endl;
         double hour=params.timeStamp.time().hour()+params.timeStamp.time().minute()/60. +params.timeStamp.time().second()/3600;
         outFile <<params.timeStamp.date().month() <<" "<<  params.timeStamp.date().day() <<" "<< hour << " "<< params.centerLon << " "<<  params.centerLat <<"    (month,day,hh.ddd,long.,lat.) (hh.ddd=the decimal hour in universal time)"<<endl;
-        outFile <<"1                            (tropical atmospheric mode)"<<endl;
-        outFile <<"6                            (continental)"<<endl;
-        outFile <<"25                           (visibility in km (aerosol model concentration)"<<endl;
-        outFile <<"-.130                        (target at  m above sea level)"<<endl;
+        outFile <<atmMode<<"                            (tropical atmospheric mode)"<<endl;
+        outFile <<continental<<"                            (continental)"<<endl;
+        outFile <<visibility<<"                           (visibility in km (aerosol model concentration)"<<endl;
+        outFile <<heightSeaLevel<<"                        (target at  m above sea level)"<<endl;
         outFile <<"-1000                        (sensor on board of satellite)"<<endl;
         outFile << table.id6s <<"                          (band of TM Landsat 5)"<<endl;
         outFile <<"-1                           (TM image with reflectance scalled between 0 and 255)"<<endl;
