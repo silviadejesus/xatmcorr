@@ -176,7 +176,7 @@ bool DnToToa::Correction6S(const char * filename, const char * inpFileName, cons
     
     QProcess proc6S;
     print("Processing atmospheric correction");
-    proc6S.addArgument("wineconsole");
+    //proc6S.addArgument("wineconsole");
     proc6S.addArgument(path6s.c_str());
     proc6S.start();
     while (proc6S.isRunning ()) {
