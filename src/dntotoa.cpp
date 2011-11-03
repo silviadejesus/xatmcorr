@@ -111,7 +111,7 @@ bool DnToToa::DnToReflectance(const char* filename, int atmMode, int continental
     int nYsize = poBand->GetYSize();
 
     float *pafScanline = (float *) CPLMalloc(sizeof(float)*nXSize);
-    char *pafWriteline = (char *) CPLMalloc(sizeof(char)*nXSize);
+    unsigned char *pafWriteline = (unsigned char *) CPLMalloc(sizeof(unsigned char)*nXSize);
 
     print("Opening input and output files.");
     //creating output file
@@ -137,9 +137,11 @@ bool DnToToa::DnToReflectance(const char* filename, int atmMode, int continental
             //if ((i==2000) && (j==2000))
             //    cout<<"teste"<<endl;
             newval=c*(a*(pafScanline[i]-auxtable.dnMin) + auxtable.lmin);
+            if (newval<0) newval=0.;
+            if (newval>255) newval=1.;
 
             //if (newval<0) newval=0;
-            pafWriteline[i]=char(floor(newval*255));
+            pafWriteline[i]=int(newval*255);
         }
         poOutBand->RasterIO( GF_Write, 0, j, nXSize, 1,pafWriteline, nXSize, 1, GDT_Byte,0, 0 );
     }
