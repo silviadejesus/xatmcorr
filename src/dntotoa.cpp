@@ -12,8 +12,8 @@ DnToToa::~DnToToa() {
 bool DnToToa::write6SFile(SensorParam params, auxTable table, long int npixels, int atmMode, int continental, double visibility, double heightSeaLevel,std::string prefix) {
     std::ofstream outFile;
     outFile.open(prefix.c_str());
+    outFile.precision(4);
     outFile.setf(ios::fixed);
-    outFile.precision(2);
     if (outFile.is_open()) {
         outFile << table.geometry<<"                            (Landsat TM geometrical conditions)"<<endl;
         double hour=params.timeStamp.time().hour()+params.timeStamp.time().minute()/60. +params.timeStamp.time().second()/3600;
@@ -63,9 +63,12 @@ double DnToToa::solarIncidence(double lat, QDateTime timeStamp) {
 }
 /** Sun's declination computation */
 double DnToToa::getSunDeclination(QDate date) {
-    int dJul=-1*date.daysTo(QDate(date.year(),1,1));
-    double declination=23.45*sin((dJul+284)*360/365*pi/180)*pi/180;
-    return declination;
+    int dJul=-1*date.daysTo(QDate(date.year(),1,1))+1;
+    //double declination=23.44*sin((dJul+284)*360/365*pi/180)*pi/180;
+    double y=2*pi/365*(dJul-1);
+    
+    double declination2=(0.006918-0.399912* cos(y) + 0.070257 *sin(y) - 0.006758 * cos(2*y) + 0.000907* sin(2*y) - 0.002697 * cos(3*y) + 0.00148*sin(3*y));
+    return declination2;
 }
 
 /*! converts tm date to yearly date */
@@ -91,7 +94,10 @@ bool DnToToa::DnToReflectance(const char* filename, int atmMode, int continental
     auxTable auxtable;
     std::string csvPath=this->homePath+"/radiancia.csv";
     print(csvPath);
-    auxtable.readAuxTable(params.bandNumber.c_str(), params.sensorName.c_str(),params.satellite.c_str(),params.timeStamp,csvPath.c_str());
+    if (!auxtable.readAuxTable(params.bandNumber.c_str(), params.sensorName.c_str(),params.satellite.c_str(),params.timeStamp,csvPath.c_str())) {
+        print("This sensor is not documented on radiancia.csv");
+        return false;
+    }
     //can't the incidence angle be computed also?
     double incidence=this->solarIncidence(params.centerLat,params.timeStamp);
     print(incidence*180/pi<< " "<< params.incidenceAngle);
@@ -137,11 +143,11 @@ bool DnToToa::DnToReflectance(const char* filename, int atmMode, int continental
             //if ((i==2000) && (j==2000))
             //    cout<<"teste"<<endl;
             newval=c*(a*(pafScanline[i]-auxtable.dnMin) + auxtable.lmin);
+            //print(c<<" "<<a<<" "<<newval);
             if (newval<0) newval=0.;
             if (newval>255) newval=1.;
 
-            //if (newval<0) newval=0;
-            pafWriteline[i]=int(newval*255);
+            pafWriteline[i]=Round(newval*255);
         }
         poOutBand->RasterIO( GF_Write, 0, j, nXSize, 1,pafWriteline, nXSize, 1, GDT_Byte,0, 0 );
     }
@@ -167,11 +173,12 @@ bool DnToToa::Correction6S(const char * filename, const char * inpFileName, cons
     path6s+="6S";
     path6s+=QDir::separator();
     path6s+="6S_ATMS_CORR.EXE";
-    
+    std::string resFileName=inpFileName;
+    resFileName.replace(resFileName.find(".inp"),4,".res");
     //prepare INPFILES.TXT
     std::ofstream inpfiles("INPFILES.TXT");
     inpfiles<<inpFileName<<std::endl;
-    inpfiles<<"nothing.res"<<std::endl;
+    inpfiles<<resFileName<<std::endl;
     inpfiles<<filename<<std::endl;
     inpfiles<<surfFileName<<std::endl;
     inpfiles.close();
@@ -226,7 +233,7 @@ bool DnToToa::CleanUp(const char * path, const char * filename, const char * inp
     headerPath+=".hdr";
     newHeader+=surfFileName;
     newHeader+=".hdr";
-    print(headerPath<< " e " <<newHeader);
+    //print(headerPath<< " e " <<newHeader);
     
     //copying the headers
     this->copyHeaders(headerPath.c_str(),newHeader.c_str());

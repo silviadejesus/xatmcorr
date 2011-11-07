@@ -49,7 +49,7 @@ bool auxTable::readAuxTable(const char*  bandNumber, const char*  sensor, const 
                    
                     StringToVector(params[11],pieces2,"-");
                     this->dateMax=QDate( atoi(pieces2[0].c_str()) ,   atoi(pieces2[1].c_str()) , atoi(pieces2[2].c_str()));
-                    print((this->dateMin<timeStamp.date()) <<" "<< (this->dateMax>timeStamp.date()));
+                    //print((this->dateMin<timeStamp.date()) <<" "<< (this->dateMax>timeStamp.date()));
                     if ((this->dateMin<timeStamp.date()) && (this->dateMax>timeStamp.date()) ) {
                         std::cout<<satellite<<" "<<sensor <<" "<<bandNumber <<" "<<params[10]<<" "<<params[11]<<std::endl;
                         myfile.close();

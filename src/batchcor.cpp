@@ -19,7 +19,7 @@ void batchCor::run() {
     DnToToa oneImageProcess(this->homePath.c_str());//=new DnToToa();
     int i;
     for (i=0; i<this->table1->numRows();i++) {
-        std::cout<<i<<this->table1->numRows()<<std::endl;
+        //std::cout<<i<<this->table1->numRows()<<std::endl;
         atmMode=this->table1->text(i,2).toInt();
         continental=this->table1->text(i,3).toInt();
         visibility=this->table1->text(i,4).toDouble();
@@ -35,7 +35,11 @@ void batchCor::run() {
         //transform to reflectance TOA
         toaFileName=filename;
         toaFileName.replace(filename.find("."),4,"-toa");
-        oneImageProcess.DnToReflectance(filename.c_str(),atmMode,continental,visibility,heightSeaLevel,toaFileName.c_str());
+        
+        if (!oneImageProcess.DnToReflectance(filename.c_str(),atmMode,continental,visibility,heightSeaLevel,toaFileName.c_str())) {
+            print("Problems converting to Top of Atmosphere reflectance.");
+            return;
+        }
         surfFileName=filename;
         surfFileName.replace(filename.find("."),5,"-surf");
         inpFileName=filename;
@@ -68,7 +72,7 @@ void batchCor::openTable() {
     if (infile.is_open()) {
         while (!infile.eof()) {
             getline(infile,line);
-            std::cout<<line<<std::endl;
+            //std::cout<<line<<std::endl;
             if (line!="") {
                 pieces=QStringList::split(",",line);
                 this->table1->insertRows(i);
@@ -76,7 +80,7 @@ void batchCor::openTable() {
                     this->table1->setText(i,j,pieces[j]);
                 }
                 
-                std::cout<<pieces.size()<<std::endl;
+                //std::cout<<pieces.size()<<std::endl;
             }
             i++;
         }
