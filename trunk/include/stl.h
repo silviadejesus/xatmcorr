@@ -38,7 +38,7 @@ double toJulian(tm dateTime);
 #endif // STL_H
 // disable warnings about long names
 
-
+#define  Round(x)  ((int)(x+0.5))
 
 #define print(x) std::cout<<x<<std::endl;
 #define pi 3.14159265
