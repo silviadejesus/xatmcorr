@@ -24,7 +24,8 @@ int main(int argc, char** argv)
     //print(SunEarthDistanceRatio(109));
     bool res=false;
     int atmMode,continental;
-    double visibility,heightSeaLevel;
+    double heightSeaLevel;
+    string visibility;
     QApplication a( argc, argv );
     if (argc>1) { //if no parameters were passed, open main window
         if (argc>5) {
