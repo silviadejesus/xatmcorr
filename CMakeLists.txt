@@ -23,6 +23,10 @@ set(tinyXMLSRCS tinyxml/tinystr.cpp tinyxml/tinyxml.cpp tinyxml/tinyxmlerror.cpp
 
 set(Ui_Implem include/batchcor.h)
 
+#HEADERS just so that qtcreator can find the headers also
+set(AtmCorr_HEADERS include/auxtable.h include/sensorparam.h include/stl.h  include/batchcor.h include/dntotoa.h)
+
+#SOURCE
 set(AtmCorr_SRCS src/auxtable.cpp src/main.cpp  src/sensorparam.cpp src/stl.cpp  src/batchcor.cpp src/dntotoa.cpp)
 
 
@@ -39,6 +43,6 @@ include_directories(${QT_INCLUDE_DIR})
 
 #kde3_automoc(AtmCorr_SRCS)
 
-add_executable(AtmCorr ${AtmCorr_SRCS} ${tinyXMLSRCS}  ${project_UI_MOC} ${project_UI_SRCS})
+add_executable(AtmCorr ${AtmCorr_SRCS} ${tinyXMLSRCS}  ${project_UI_MOC} ${project_UI_SRCS} ${AtmCorr_HEADERS})
 target_link_libraries(AtmCorr ${LIBS} ${QT_LIBRARIES})
 #target_link_libraries(AtmCorr ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY})
