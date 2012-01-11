@@ -9,8 +9,9 @@ DnToToa::~DnToToa() {
 
 
 /*! Outputs a text file that is read by 6S*/
-bool DnToToa::write6SFile(SensorParam params, auxTable table, long int npixels, int atmMode, int continental, double visibility, double heightSeaLevel,std::string prefix) {
+bool DnToToa::write6SFile(SensorParam params, auxTable table, long int npixels, int atmMode, int continental, string visibility, double heightSeaLevel,std::string prefix) {
     std::ofstream outFile;
+    std::string separator=";";
     outFile.open(prefix.c_str());
     outFile.precision(4);
     outFile.setf(ios::fixed);
@@ -20,7 +21,16 @@ bool DnToToa::write6SFile(SensorParam params, auxTable table, long int npixels, 
         outFile <<params.timeStamp.date().month() <<" "<<  params.timeStamp.date().day() <<" "<< hour << " "<< params.centerLon << " "<<  params.centerLat <<"    (month,day,hh.ddd,long.,lat.) (hh.ddd=the decimal hour in universal time)"<<endl;
         outFile <<atmMode<<"                            (tropical atmospheric mode)"<<endl;
         outFile <<continental<<"                            (continental)"<<endl;
-        outFile <<visibility<<"                           (visibility in km (aerosol model concentration)"<<endl;
+
+        if (visibility.find(separator)==string::npos) {
+            outFile <<visibility<<"                           (visibility in km (aerosol model concentration)"<<endl;
+        } else {
+            //this case is to use the oxygen and
+            int sepIndex=visibility.find(separator);
+            outFile <<8<<"                            (enter water vapor and ozone contents)"<<endl;
+            outFile <<visibility.substr(0,sepIndex)<<endl;
+            outFile <<visibility.substr(sepIndex+1,visibility.size()-sepIndex)<<endl;
+        }
         outFile <<heightSeaLevel<<"                        (target at  m above sea level)"<<endl;
         outFile <<"-1000                        (sensor on board of satellite)"<<endl;
         outFile << table.id6s <<"                          (band of TM Landsat 5)"<<endl;
@@ -44,21 +54,21 @@ double DnToToa::SunEarthDistanceRatio(int d_n) {
 }
 
 /** */
-double DnToToa::angularTime(QTime time) {
-    QTime midday(12,0,0);
-    int seconds=midday.secsTo(time);
-    double decTime=seconds/3600.;
+double DnToToa::angularTime(QTime time, double lon) {
     
-    return (decTime*pi/12);
+    lon=lon*12./180.;
+    double ftime=time.hour()+time.minute()/60.+time.second()/3600.;
+    double decTime=12-ftime-lon;
+    return (decTime*pi/12.);
 }
 
 /**Computes the solar incidence in a given latitude at the given time*/
-double DnToToa::solarIncidence(double lat, QDateTime timeStamp) {
+double DnToToa::solarIncidence(double lat, double lon, QDateTime timeStamp) {
     double delta=this->getSunDeclination(timeStamp.date());
-    double omega=this->angularTime(timeStamp.time());
+    double omega=this->angularTime(timeStamp.time(), lon);
     lat*=pi/180;
-    double zenital=acos(sin(delta)*sin(lat) +cos(delta)*cos(lat)*cos(omega));
-    return (pi/2-zenital);
+    double elev=asin(sin(delta)*sin(lat) +cos(delta)*cos(lat)*cos(omega));
+    return elev;
     //return d2r(42.4467);
 }
 /** Sun's declination computation */
@@ -84,7 +94,7 @@ double DnToToa::coeficient(double esun, double incidence, QDate date) {
 }
 
 //Processes both dn to toa radiance and toa radiance to reflectance
-bool DnToToa::DnToReflectance(const char* filename, int atmMode, int continental, double visibility, double heightSeaLevel, const char *toaFileName) {
+bool DnToToa::DnToReflectance(const char* filename, int atmMode, int continental, string visibility, double heightSeaLevel, const char *toaFileName) {
     SensorParam params;
     std::string xmlFilename=filename;
     print("Reading XML metadata.");
@@ -99,7 +109,7 @@ bool DnToToa::DnToReflectance(const char* filename, int atmMode, int continental
         return false;
     }
     //can't the incidence angle be computed also?
-    double incidence=this->solarIncidence(params.centerLat,params.timeStamp);
+    double incidence=this->solarIncidence(params.centerLat, params.centerLon, params.timeStamp);
     print(incidence*180/pi<< " "<< params.incidenceAngle);
     double c=coeficient(auxtable.esun,incidence,params.timeStamp.date());
     //print(c);
