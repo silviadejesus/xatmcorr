@@ -9,8 +9,8 @@ void batchCor::printText(const char* text) {
 }
 
 void batchCor::run() {
-    int atmMode, continental;
-    string visibility;
+    int continental;
+    string visibility,atmMode;
     double heightSeaLevel;
     //QString atm;//=new QString();
     std::string filename, toaFileName, surfFileName,inpFileName;
@@ -20,7 +20,7 @@ void batchCor::run() {
     int i;
     for (i=0; i<this->table1->numRows();i++) {
         //std::cout<<i<<this->table1->numRows()<<std::endl;
-        atmMode=this->table1->text(i,2).toInt();
+        atmMode=this->table1->text(i,2).ascii();
         continental=this->table1->text(i,3).toInt();
         visibility=this->table1->text(i,4).ascii();
         heightSeaLevel=this->table1->text(i,5).toDouble()*-0.001;

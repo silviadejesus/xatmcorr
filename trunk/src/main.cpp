@@ -23,15 +23,15 @@ int main(int argc, char** argv)
 {
     //print(SunEarthDistanceRatio(109));
     bool res=false;
-    int atmMode,continental;
+    int continental;
     double heightSeaLevel;
-    string visibility;
+    string visibility,atmMode;
     QApplication a( argc, argv );
     if (argc>1) { //if no parameters were passed, open main window
         if (argc>5) {
-            atmMode=atoi(argv[2]);
+            atmMode=argv[2];
             continental=atoi(argv[3]);
-            visibility=atof(argv[4]);
+            visibility=argv[4];
             heightSeaLevel=atof(argv[5]);
         }
         DnToToa tool1(a.applicationDirPath().ascii());

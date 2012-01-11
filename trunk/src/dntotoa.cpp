@@ -9,7 +9,7 @@ DnToToa::~DnToToa() {
 
 
 /*! Outputs a text file that is read by 6S*/
-bool DnToToa::write6SFile(SensorParam params, auxTable table, long int npixels, int atmMode, int continental, string visibility, double heightSeaLevel,std::string prefix) {
+bool DnToToa::write6SFile(SensorParam params, auxTable table, long int npixels, string atmMode, int continental, string visibility, double heightSeaLevel,std::string prefix) {
     std::ofstream outFile;
     std::string separator=";";
     outFile.open(prefix.c_str());
@@ -19,18 +19,18 @@ bool DnToToa::write6SFile(SensorParam params, auxTable table, long int npixels, 
         outFile << table.geometry<<"                            (Landsat TM geometrical conditions)"<<endl;
         double hour=params.timeStamp.time().hour()+params.timeStamp.time().minute()/60. +params.timeStamp.time().second()/3600;
         outFile <<params.timeStamp.date().month() <<" "<<  params.timeStamp.date().day() <<" "<< hour << " "<< params.centerLon << " "<<  params.centerLat <<"    (month,day,hh.ddd,long.,lat.) (hh.ddd=the decimal hour in universal time)"<<endl;
-        outFile <<atmMode<<"                            (tropical atmospheric mode)"<<endl;
-        outFile <<continental<<"                            (continental)"<<endl;
 
-        if (visibility.find(separator)==string::npos) {
-            outFile <<visibility<<"                           (visibility in km (aerosol model concentration)"<<endl;
+        if (atmMode.find(separator)==string::npos) {
+            outFile <<atmMode<<"                            (tropical atmospheric mode)"<<endl;
         } else {
             //this case is to use the oxygen and
-            int sepIndex=visibility.find(separator);
+            int sepIndex=atmMode.find(separator);
             outFile <<8<<"                            (enter water vapor and ozone contents)"<<endl;
-            outFile <<visibility.substr(0,sepIndex)<<endl;
-            outFile <<visibility.substr(sepIndex+1,visibility.size()-sepIndex)<<endl;
+            outFile <<atmMode.substr(0,sepIndex)<<endl;
+            outFile <<atmMode.substr(sepIndex+1,atmMode.size()-sepIndex)<<endl;
         }
+        outFile <<continental<<"                            (continental)"<<endl;
+        outFile <<visibility<<"                           (visibility in km (aerosol model concentration)"<<endl;
         outFile <<heightSeaLevel<<"                        (target at  m above sea level)"<<endl;
         outFile <<"-1000                        (sensor on board of satellite)"<<endl;
         outFile << table.id6s <<"                          (band of TM Landsat 5)"<<endl;
@@ -94,7 +94,7 @@ double DnToToa::coeficient(double esun, double incidence, QDate date) {
 }
 
 //Processes both dn to toa radiance and toa radiance to reflectance
-bool DnToToa::DnToReflectance(const char* filename, int atmMode, int continental, string visibility, double heightSeaLevel, const char *toaFileName) {
+bool DnToToa::DnToReflectance(const char* filename, string atmMode, int continental, string visibility, double heightSeaLevel, const char *toaFileName) {
     SensorParam params;
     std::string xmlFilename=filename;
     print("Reading XML metadata.");
