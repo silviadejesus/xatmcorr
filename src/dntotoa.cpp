@@ -127,14 +127,14 @@ bool DnToToa::DnToReflectance(const char* filename, string atmMode, int continen
     int nYsize = poBand->GetYSize();
 
     float *pafScanline = (float *) CPLMalloc(sizeof(float)*nXSize);
-    unsigned char *pafWriteline = (unsigned char *) CPLMalloc(sizeof(unsigned char)*nXSize);
+    float *pafWriteline = (float *) CPLMalloc(sizeof(float)*nXSize);
 
     print("Opening input and output files.");
     //creating output file
-    GDALDriver * poDriver=GetGDALDriverManager()->GetDriverByName("ENVI");
+    GDALDriver * poDriver=GetGDALDriverManager()->GetDriverByName("GTiff");
     char ** options= NULL;
     //options=CSLSetNameValue(options,"SUFFIX","ADD");
-    GDALDataset * poDstDS=poDriver->Create(toaFileName,nXSize,nYsize,1,GDT_Byte, NULL);
+    GDALDataset * poDstDS=poDriver->Create(toaFileName,nXSize,nYsize,1,GDT_Float32, NULL);
 
     //copying geographic header
     double * geotransform= new double[6];
@@ -144,6 +144,11 @@ bool DnToToa::DnToReflectance(const char* filename, string atmMode, int continen
     poDstDS->SetProjection(poDataset->GetProjectionRef());
     GDALRasterBand * poOutBand=poDstDS->GetRasterBand(1);
     float newval;
+
+    print("Writing atmospheric correction files.");
+    std::string inpFileName=filename;
+    inpFileName.replace(inpFileName.find(".tif"),4,".inp");
+    write6SFile(params,auxtable, nXSize*nYsize,atmMode,continental, visibility, heightSeaLevel,inpFileName.c_str());
     
     //performing the transformation from DN to Top Of Atmosphere
     print("Computing Reflectance Top of Atmosphere.");
@@ -159,48 +164,66 @@ bool DnToToa::DnToReflectance(const char* filename, string atmMode, int continen
 
             pafWriteline[i]=Round(newval*255);
         }
-        poOutBand->RasterIO( GF_Write, 0, j, nXSize, 1,pafWriteline, nXSize, 1, GDT_Byte,0, 0 );
+        poOutBand->RasterIO( GF_Write, 0, j, nXSize, 1,pafWriteline, nXSize, 1, GDT_Float32,0, 0 );
     }
     GDALClose(poDstDS);
     GDALClose(poDataset);
     print("TOA Reflectance file finished.");
 
-    print("Writing atmospheric correction files.");
-        
-    std::string inpFileName=filename;
-    inpFileName.replace(inpFileName.find(".tif"),4,".inp");
-    write6SFile(params,auxtable, nXSize*nYsize,atmMode,continental, visibility, heightSeaLevel,inpFileName.c_str());
+
     print("Done.")
     return true;
     //return outMatrix*c*255;
 }
 
 bool DnToToa::Correction6S(const char * filename, const char * inpFileName, const char *surfFileName) {
+    //prearations for 6s transformation
+    TransformInput ti;
+    init_6S((char*)inpFileName);
+    ti=compute();
 
-    
-    //path to where the 6S program is
-    std::string path6s=this->homePath+QDir::separator();
-    path6s+="6S";
-    path6s+=QDir::separator();
-    path6s+="6S_ATMS_CORR.EXE";
-    std::string resFileName=inpFileName;
-    resFileName.replace(resFileName.find(".inp"),4,".res");
-    //prepare INPFILES.TXT
-    std::ofstream inpfiles("INPFILES.TXT");
-    inpfiles<<inpFileName<<std::endl;
-    inpfiles<<resFileName<<std::endl;
-    inpfiles<<filename<<std::endl;
-    inpfiles<<surfFileName<<std::endl;
-    inpfiles.close();
-    
-    QProcess proc6S;
-    print("Processing atmospheric correction");
-    //proc6S.addArgument("wineconsole");
-    proc6S.addArgument(path6s.c_str());
-    proc6S.start();
-    while (proc6S.isRunning ()) {
-        //wait
+    //opening image
+    GDALAllRegister();
+    GDALDataset  *poDataset = (GDALDataset *) GDALOpen( filename, GA_ReadOnly );
+    if( poDataset == NULL )  { cout<< "Could not open the image."<<endl; return 0; }
+    GDALRasterBand *poBand = poDataset->GetRasterBand( 1 );
+    if( poBand == NULL )  { cout<< "Could not open the image."<<endl; return 0; }
+    int nXSize = poBand->GetXSize();
+    int nYsize = poBand->GetYSize();
+
+    float *pafScanline = (float *) CPLMalloc(sizeof(float)*nXSize);
+    float *pafWriteline = (float *) CPLMalloc(sizeof(float)*nXSize);
+
+    print("Opening input and output files.");
+
+    //creating output file
+    GDALDriver * poDriver=GetGDALDriverManager()->GetDriverByName("GTiff");
+    char ** options= NULL;
+
+    GDALDataset * poDstDS=poDriver->Create(surfFileName,nXSize,nYsize,1,GDT_Float32, NULL);
+
+    //copying geographic header
+    double * geotransform= new double[6];
+    poDataset->GetGeoTransform(geotransform);
+    poDstDS->SetGeoTransform(geotransform);
+    delete geotransform;
+    poDstDS->SetProjection(poDataset->GetProjectionRef());
+    GDALRasterBand * poOutBand=poDstDS->GetRasterBand(1);
+    float newval,idn,odn;
+
+    //applying 6S transformation
+    for (int j=0;j<nYsize;j++) {
+        poBand->RasterIO( GF_Read, 0, j, nXSize, 1,pafScanline, nXSize, 1, GDT_Float32,0, 0 );
+        for (int i=0;i<nXSize;i++) {
+            idn=pafScanline[i]/255.;
+            odn=transform(ti,REFLECTANCE,idn)*100;
+            pafWriteline[i]=odn;
+        }
+        poOutBand->RasterIO( GF_Write, 0, j, nXSize, 1,pafWriteline, nXSize, 1, GDT_Float32,0, 0 );
     }
+    GDALClose(poDstDS);
+    GDALClose(poDataset);
+    
     print("Done.")
     return true;
 }
