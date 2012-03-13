@@ -1,12 +1,16 @@
-project(AtmCorr)
+project(XAtmCorr)
 cmake_minimum_required(VERSION 2.6)
+SET(CMAKE_BUILD_TYPE Debug)
+
 #find_package(Qt4 REQUIRED)
 
 #set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${AtmCorr_SOURCE_DIR}")#"${CMAKE_CURRENT_SOURCE_DIR}")
 SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR} ${CMAKE_MODULE_PATH})
 find_package(GDAL REQUIRED)
-include_directories(${GDAL_INCLUDE_DIR})
+include_directories(${GDAL_INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/i.atcorr)
 set(LIBS ${LIBS} ${GDAL_LIBRARY})
+add_subdirectory(i.atcorr)
+
 
 #include_directories(/usr/include/gdal)
 #link_libraries(/usr/lib)
@@ -31,18 +35,18 @@ set(AtmCorr_SRCS src/auxtable.cpp src/main.cpp  src/sensorparam.cpp src/stl.cpp 
 
 
 # Make ui files from the designer to header files
-QT_WRAP_UI(AtmCorr project_UI_HDRS project_UI_SRCS ${project_UI})
-QT_WRAP_CPP(AtmCorr project_UI_MOC ${Ui_Implem} )
+QT_WRAP_UI(XAtmCorr project_UI_HDRS project_UI_SRCS ${project_UI})
+QT_WRAP_CPP(XAtmCorr project_UI_MOC ${Ui_Implem} )
 
 #SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
 #SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin) 
 
-include_directories( ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/tinyxml ${CMAKE_CURRENT_SOURCE_DIR}/include) # ${QT_INCLUDES})
+include_directories( ${CMAKE_CURRENT_BINARY_DIR} i.atcor ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/tinyxml ${CMAKE_CURRENT_SOURCE_DIR}/include) # ${QT_INCLUDES})
 include_directories(${QT_INCLUDE_DIR})
 
 
 #kde3_automoc(AtmCorr_SRCS)
 
-add_executable(AtmCorr ${AtmCorr_SRCS} ${tinyXMLSRCS}  ${project_UI_MOC} ${project_UI_SRCS} ${AtmCorr_HEADERS})
-target_link_libraries(AtmCorr ${LIBS} ${QT_LIBRARIES})
+add_executable(XAtmCorr ${AtmCorr_SRCS} ${tinyXMLSRCS}  ${project_UI_MOC} ${project_UI_SRCS} ${AtmCorr_HEADERS})
+target_link_libraries(XAtmCorr ${LIBS} ${QT_LIBRARIES} gdal6slib)
 #target_link_libraries(AtmCorr ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY})

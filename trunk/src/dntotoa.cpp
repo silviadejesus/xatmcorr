@@ -95,13 +95,11 @@ double DnToToa::coeficient(double esun, double incidence, QDate date) {
 
 //Processes both dn to toa radiance and toa radiance to reflectance
 bool DnToToa::DnToReflectance(const char* filename, string atmMode, int continental, string visibility, double heightSeaLevel, const char *toaFileName) {
-    SensorParam params;
     std::string xmlFilename=filename;
     print("Reading XML metadata.");
     xmlFilename.replace(xmlFilename.find(".tif"),4,".xml");
     params.readFromXml(xmlFilename);
     print("Reading sensor parameters");
-    auxTable auxtable;
     std::string csvPath=this->homePath+"/radiancia.csv";
     print(csvPath);
     if (!auxtable.readAuxTable(params.bandNumber.c_str(), params.sensorName.c_str(),params.satellite.c_str(),params.timeStamp,csvPath.c_str())) {
@@ -228,6 +226,57 @@ bool DnToToa::Correction6S(const char * filename, const char * inpFileName, cons
     return true;
 }
 
+bool DnToToa::WaterCorrection(const char * filename, const char *surfFileName) {
+    double rho_specular=rhoSpecular(this->params.incidenceAngle,this->auxtable.ee0);
+    double rho_water=auxtable.rho_water;
+
+    //opening image
+    GDALAllRegister();
+    GDALDataset  *poDataset = (GDALDataset *) GDALOpen( surfFileName, GA_ReadOnly );
+    if( poDataset == NULL )  { cout<< "Could not open the image."<<endl; return 0; }
+    GDALRasterBand *poBand = poDataset->GetRasterBand( 1 );
+    if( poBand == NULL )  { cout<< "Could not open the image."<<endl; return 0; }
+    int nXSize = poBand->GetXSize();
+    int nYsize = poBand->GetYSize();
+
+    float *pafScanline = (float *) CPLMalloc(sizeof(float)*nXSize);
+    float *pafWriteline = (float *) CPLMalloc(sizeof(float)*nXSize);
+
+    print("Opening input and output files.");
+
+    //creating output file
+    GDALDriver * poDriver=GetGDALDriverManager()->GetDriverByName("GTiff");
+    char ** options= NULL;
+
+    GDALDataset * poDstDS=poDriver->Create(filename,nXSize,nYsize,1,GDT_Float32, NULL);
+
+    //copying geographic header
+    double * geotransform= new double[6];
+    poDataset->GetGeoTransform(geotransform);
+    poDstDS->SetGeoTransform(geotransform);
+    delete geotransform;
+    poDstDS->SetProjection(poDataset->GetProjectionRef());
+    GDALRasterBand * poOutBand=poDstDS->GetRasterBand(1);
+    float newval,idn,odn;
+
+    //applying 6S transformation
+    for (int j=0;j<nYsize;j++) {
+        poBand->RasterIO( GF_Read, 0, j, nXSize, 1,pafScanline, nXSize, 1, GDT_Float32,0, 0 );
+        for (int i=0;i<nXSize;i++) {
+            idn=pafScanline[i];
+            odn=waterSpecularCorrection(idn,rho_water,rho_specular);
+            pafWriteline[i]=odn;
+        }
+        poOutBand->RasterIO( GF_Write, 0, j, nXSize, 1,pafWriteline, nXSize, 1, GDT_Float32,0, 0 );
+    }
+    GDALClose(poDstDS);
+    GDALClose(poDataset);
+
+    print("Done.")
+    return true;
+}
+
+
 /** text file copy */
 bool DnToToa::copyHeaders (const char * headerPath, const char * newHeader) {
     ifstream source(headerPath);
@@ -256,19 +305,20 @@ bool DnToToa::CleanUp(const char * path, const char * filename, const char * inp
     //dirPath.remove(inpPath.c_str());
     
     //erasing INPFILES.TXT
-    std::string inpfilesPath=curFile+"INPFILES.TXT";
-    dirPath.remove(inpfilesPath.c_str());
+    //std::string inpfilesPath=curFile+"INPFILES.TXT";
+    //dirPath.remove(inpfilesPath.c_str());
     
-    //copying the toa's header to surf
-    std::string headerPath=curFile;
-    std::string newHeader=headerPath;
-    headerPath+=filename;
-    headerPath+=".hdr";
-    newHeader+=surfFileName;
-    newHeader+=".hdr";
-    //print(headerPath<< " e " <<newHeader);
-    
-    //copying the headers
-    this->copyHeaders(headerPath.c_str(),newHeader.c_str());
+
     return true;
+}
+
+double DnToToa::rhoSpecular(double inc, double ee0) {
+    double root=sqrt(ee0-sin(inc)*sin(inc));
+    double rhoV=( cos(inc) - root ) / ( cos(inc) +root );
+    double rhoH=( ee0*cos(inc) - root ) / ( ee0*cos(inc) + root);
+    return (rhoV*rhoV + rhoH*rhoH)/2;
+}
+
+double DnToToa::waterSpecularCorrection(double sup, double rho_water, double rho_specular) {
+    return sup/(1-rho_water)/(1-rho_specular);
 }
