@@ -42,7 +42,8 @@ bool auxTable::readAuxTable(const char*  bandNumber, const char*  sensor, const 
                     this->dnMin=StrToFloat(params[7]);
                     this->dnMax=StrToFloat(params[8]);
                     this->geometry=atoi(params[9].c_str());
-                    this->ee0=StrToFloat(params[10]);
+                    this->ee0=StrToFloat(params[12]);
+                    this->rho_water=StrToFloat(params[13]);
                     
                     vector<string> pieces,pieces2;
                     StringToVector(params[10],pieces,"-");

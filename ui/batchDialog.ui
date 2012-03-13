@@ -8,8 +8,8 @@
         <rect>
             <x>0</x>
             <y>0</y>
-            <width>656</width>
-            <height>399</height>
+            <width>665</width>
+            <height>294</height>
         </rect>
     </property>
     <property name="caption">
@@ -50,7 +50,7 @@
                 </widget>
             </hbox>
         </widget>
-        <widget class="QLayoutWidget" row="2" column="0">
+        <widget class="QLayoutWidget" row="3" column="0">
             <property name="name">
                 <cstring>layout3</cstring>
             </property>
@@ -117,54 +117,54 @@
                 </widget>
             </hbox>
         </widget>
-        <widget class="QSplitter" row="1" column="0">
+        <widget class="QTable" row="1" column="0">
+            <column>
+                <property name="text">
+                    <string>Arquivo</string>
+                </property>
+            </column>
+            <column>
+                <property name="text">
+                    <string>Xml</string>
+                </property>
+            </column>
+            <column>
+                <property name="text">
+                    <string>Atmosfera (modelo)</string>
+                </property>
+            </column>
+            <column>
+                <property name="text">
+                    <string>Aerosol (modelo)</string>
+                </property>
+            </column>
+            <column>
+                <property name="text">
+                    <string>Visibilidade (km)</string>
+                </property>
+            </column>
+            <column>
+                <property name="text">
+                    <string>Altitude (m)</string>
+                </property>
+            </column>
             <property name="name">
-                <cstring>splitter2</cstring>
+                <cstring>table1</cstring>
             </property>
-            <property name="orientation">
-                <enum>Vertical</enum>
+            <property name="numRows">
+                <number>1</number>
             </property>
-            <widget class="QTable">
-                <column>
-                    <property name="text">
-                        <string>Arquivo</string>
-                    </property>
-                </column>
-                <column>
-                    <property name="text">
-                        <string>Xml</string>
-                    </property>
-                </column>
-                <column>
-                    <property name="text">
-                        <string>Atmosfera (modelo)</string>
-                    </property>
-                </column>
-                <column>
-                    <property name="text">
-                        <string>Aerosol (modelo)</string>
-                    </property>
-                </column>
-                <column>
-                    <property name="text">
-                        <string>Visibilidade (km)</string>
-                    </property>
-                </column>
-                <column>
-                    <property name="text">
-                        <string>Altitude (m)</string>
-                    </property>
-                </column>
-                <property name="name">
-                    <cstring>table1</cstring>
-                </property>
-                <property name="numRows">
-                    <number>1</number>
-                </property>
-                <property name="numCols">
-                    <number>6</number>
-                </property>
-            </widget>
+            <property name="numCols">
+                <number>6</number>
+            </property>
+        </widget>
+        <widget class="QCheckBox" row="2" column="0">
+            <property name="name">
+                <cstring>waterCheckBox</cstring>
+            </property>
+            <property name="text">
+                <string>Aplicar correção de reflexão especular para água</string>
+            </property>
         </widget>
     </grid>
 </widget>

@@ -9,6 +9,7 @@
 #include "qfileinfo.h"
 #include "qprocess.h"
 #include "qapplication.h"
+#include "qcheckbox.h"
 
 #include "dntotoa.h"
 

@@ -13,7 +13,7 @@ void batchCor::run() {
     string visibility,atmMode;
     double heightSeaLevel;
     //QString atm;//=new QString();
-    std::string filename, toaFileName, surfFileName,inpFileName;
+    std::string filename, toaFileName, surfFileName,inpFileName, waterFileName;
     
     //QProcess *proc;
     DnToToa oneImageProcess(this->homePath.c_str());//=new DnToToa();
@@ -34,19 +34,23 @@ void batchCor::run() {
         filename=fInfo.fileName().ascii();
         //transform to reflectance TOA
         toaFileName=filename;
-        toaFileName.replace(filename.find("."),4,"-toa");
+        toaFileName.replace(filename.find("."),4,"-toa.tif");
         
         if (!oneImageProcess.DnToReflectance(filename.c_str(),atmMode,continental,visibility,heightSeaLevel,toaFileName.c_str())) {
             print("Problems converting to Top of Atmosphere reflectance.");
             return;
         }
         surfFileName=filename;
-        surfFileName.replace(filename.find("."),5,"-surf");
+        surfFileName.replace(filename.find("."),9,"-surf.tif");
         inpFileName=filename;
         inpFileName.replace(filename.find("."),4,".inp");
         //transform to reflectance Sup
         oneImageProcess.Correction6S(toaFileName.c_str(),inpFileName.c_str(),surfFileName.c_str());
-        
+        if (this->waterCheckBox->isChecked()) {
+            waterFileName=filename;
+            waterFileName.replace(filename.find("."),10,"-water.tif");
+            oneImageProcess.WaterCorrection(waterFileName.c_str(),surfFileName.c_str());
+        }
         //convert to tiff and erase files;
         oneImageProcess.CleanUp(local.c_str(), toaFileName.c_str(),inpFileName.c_str(),surfFileName.c_str());
     }

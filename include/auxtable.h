@@ -30,10 +30,9 @@
 
 class auxTable {
 public:
-    double lmin,lmax,esun, dnMin, dnMax;
+    double lmin,lmax,esun, dnMin, dnMax,ee0,rho_water;
     int id6s,geometry;
     QDate dateMin, dateMax;
-    
     auxTable();
     bool readAuxTable(const char*  bandNumber, const char*  sensor,const char* satellite, QDateTime timeStamp,const char * csvPath);
     //res={lmin:0,lmax:0,esun:0,id6s:0, dnMin:1, dnMax:255}
