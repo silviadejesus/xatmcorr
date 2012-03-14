@@ -227,7 +227,8 @@ bool DnToToa::Correction6S(const char * filename, const char * inpFileName, cons
 }
 
 bool DnToToa::WaterCorrection(const char * filename, const char *surfFileName) {
-    double rho_specular=rhoSpecular(this->params.incidenceAngle,this->auxtable.ee0);
+    double incidence=this->solarIncidence(params.centerLat, params.centerLon, params.timeStamp);
+    double rho_specular=rhoSpecular(incidence,this->auxtable.ee0);
     double rho_water=auxtable.rho_water;
 
     //opening image
