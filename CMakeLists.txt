@@ -31,7 +31,7 @@ set(Ui_Implem include/batchcor.h)
 set(AtmCorr_HEADERS include/auxtable.h include/sensorparam.h include/stl.h  include/batchcor.h include/dntotoa.h)
 
 #SOURCE
-set(AtmCorr_SRCS src/auxtable.cpp src/main.cpp  src/sensorparam.cpp src/stl.cpp  src/batchcor.cpp src/dntotoa.cpp)
+set(AtmCorr_SRCS src/auxtable.cpp src/main.cpp  src/sensorparam.cpp src/stl.cpp  src/batchcor.cpp src/dntotoa.cpp resources/resources.res)
 
 
 # Make ui files from the designer to header files
@@ -47,6 +47,6 @@ include_directories(${QT_INCLUDE_DIR})
 
 #kde3_automoc(AtmCorr_SRCS)
 
-add_executable(XAtmCorr ${AtmCorr_SRCS} ${tinyXMLSRCS}  ${project_UI_MOC} ${project_UI_SRCS} ${AtmCorr_HEADERS})
+add_executable(XAtmCorr ${AtmCorr_SRCS} ${tinyXMLSRCS}  ${project_UI_MOC} ${project_UI_SRCS} ${AtmCorr_HEADERS} )
 target_link_libraries(XAtmCorr ${LIBS} ${QT_LIBRARIES} gdal6slib)
 #target_link_libraries(AtmCorr ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY})
