@@ -15,6 +15,9 @@
     <property name="caption">
         <string>Correção Atmosférica para múltiplos arquivos</string>
     </property>
+    <property name="icon">
+        <pixmap>image0</pixmap>
+    </property>
     <grid>
         <property name="name">
             <cstring>unnamed</cstring>
@@ -168,6 +171,11 @@
         </widget>
     </grid>
 </widget>
+<images>
+    <image name="image0">
+        <data format="PNG" length="331">89504e470d0a1a0a0000000d4948445200000020000000200806000000737a7af400000112494441545885cd575b1283300804afe4a13c530fd533d10fb513c9921082b63be38821b08be62589ac420056bbeea66c74b562882f9ed7eee44db51f6298df653b4aceeab9db874be2aae7462cb28a223e137bc84a4214434b4146d0aec92da07edd58b6aa2fc478aa473ecbbe60418d1db4aa62877d157056883ec1e91359c5392bccf1d40d3a028568b75122af88302ce291f8969bacb5a1b51825562dea8ec911a147c4c09b1b1790086b799e1310aefe6f3133137aa9f333de25f686c4ad334230e3984828c0bbd5ce420bfdf29abb61f2278815da121114f8f375a012103990cc56ef8f4d1c079a3c2e22204aff3b20fb31e48c814c740594affcc64dea11c4f781a4cac76740a20873f4735851123e2ce0b790885991420000000049454e44ae426082</data>
+    </image>
+</images>
 <connections>
     <connection>
         <sender>pushButton1</sender>
