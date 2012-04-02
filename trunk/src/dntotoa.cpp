@@ -160,7 +160,7 @@ bool DnToToa::DnToReflectance(const char* filename, string atmMode, int continen
             if (newval<0) newval=0.;
             if (newval>255) newval=1.;
 
-            pafWriteline[i]=Round(newval*255);
+            pafWriteline[i]=newval*255;
         }
         poOutBand->RasterIO( GF_Write, 0, j, nXSize, 1,pafWriteline, nXSize, 1, GDT_Float32,0, 0 );
     }
