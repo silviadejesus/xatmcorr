@@ -1,219 +1,218 @@
-<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
-<class>batchDialog</class>
-<widget class="QDialog">
-    <property name="name">
-        <cstring>batchDialog</cstring>
-    </property>
-    <property name="geometry">
-        <rect>
-            <x>0</x>
-            <y>0</y>
-            <width>665</width>
-            <height>294</height>
-        </rect>
-    </property>
-    <property name="caption">
-        <string>Correção Atmosférica para múltiplos arquivos</string>
-    </property>
-    <property name="icon">
-        <pixmap>image0</pixmap>
-    </property>
-    <grid>
-        <property name="name">
-            <cstring>unnamed</cstring>
-        </property>
-        <widget class="QLayoutWidget" row="0" column="0">
-            <property name="name">
-                <cstring>layout1</cstring>
-            </property>
-            <hbox>
-                <property name="name">
-                    <cstring>unnamed</cstring>
-                </property>
-                <widget class="QLineEdit">
-                    <property name="name">
-                        <cstring>lineEdit1</cstring>
-                    </property>
-                </widget>
-                <widget class="QPushButton">
-                    <property name="name">
-                        <cstring>pushButton1</cstring>
-                    </property>
-                    <property name="sizePolicy">
-                        <sizepolicy>
-                            <hsizetype>0</hsizetype>
-                            <vsizetype>0</vsizetype>
-                            <horstretch>0</horstretch>
-                            <verstretch>0</verstretch>
-                        </sizepolicy>
-                    </property>
-                    <property name="text">
-                        <string>Abrir Pasta</string>
-                    </property>
-                </widget>
-            </hbox>
-        </widget>
-        <widget class="QLayoutWidget" row="3" column="0">
-            <property name="name">
-                <cstring>layout3</cstring>
-            </property>
-            <hbox>
-                <property name="name">
-                    <cstring>unnamed</cstring>
-                </property>
-                <widget class="QPushButton">
-                    <property name="name">
-                        <cstring>pushButton4</cstring>
-                    </property>
-                    <property name="text">
-                        <string>Salvar tabela</string>
-                    </property>
-                </widget>
-                <widget class="QPushButton">
-                    <property name="name">
-                        <cstring>pushButton5</cstring>
-                    </property>
-                    <property name="text">
-                        <string>Carregar tabela</string>
-                    </property>
-                </widget>
-                <spacer>
-                    <property name="name">
-                        <cstring>spacer1</cstring>
-                    </property>
-                    <property name="orientation">
-                        <enum>Horizontal</enum>
-                    </property>
-                    <property name="sizeType">
-                        <enum>Expanding</enum>
-                    </property>
-                    <property name="sizeHint">
-                        <size>
-                            <width>200</width>
-                            <height>20</height>
-                        </size>
-                    </property>
-                </spacer>
-                <widget class="QPushButton">
-                    <property name="name">
-                        <cstring>pushButton5_2</cstring>
-                    </property>
-                    <property name="text">
-                        <string>Ajuda</string>
-                    </property>
-                </widget>
-                <widget class="QPushButton">
-                    <property name="name">
-                        <cstring>pushButton2</cstring>
-                    </property>
-                    <property name="sizePolicy">
-                        <sizepolicy>
-                            <hsizetype>0</hsizetype>
-                            <vsizetype>0</vsizetype>
-                            <horstretch>0</horstretch>
-                            <verstretch>0</verstretch>
-                        </sizepolicy>
-                    </property>
-                    <property name="text">
-                        <string>Processar Imagens</string>
-                    </property>
-                </widget>
-            </hbox>
-        </widget>
-        <widget class="QTable" row="1" column="0">
-            <column>
-                <property name="text">
-                    <string>Arquivo</string>
-                </property>
-            </column>
-            <column>
-                <property name="text">
-                    <string>Xml</string>
-                </property>
-            </column>
-            <column>
-                <property name="text">
-                    <string>Atmosfera (modelo)</string>
-                </property>
-            </column>
-            <column>
-                <property name="text">
-                    <string>Aerosol (modelo)</string>
-                </property>
-            </column>
-            <column>
-                <property name="text">
-                    <string>Visibilidade (km)</string>
-                </property>
-            </column>
-            <column>
-                <property name="text">
-                    <string>Altitude (m)</string>
-                </property>
-            </column>
-            <property name="name">
-                <cstring>table1</cstring>
-            </property>
-            <property name="numRows">
-                <number>1</number>
-            </property>
-            <property name="numCols">
-                <number>6</number>
-            </property>
-        </widget>
-        <widget class="QCheckBox" row="2" column="0">
-            <property name="name">
-                <cstring>waterCheckBox</cstring>
-            </property>
-            <property name="text">
-                <string>Aplicar correção de reflexão especular para água</string>
-            </property>
-        </widget>
-    </grid>
-</widget>
-<images>
-    <image name="image0">
-        <data format="PNG" length="331">89504e470d0a1a0a0000000d4948445200000020000000200806000000737a7af400000112494441545885cd575b1283300804afe4a13c530fd533d10fb513c9921082b63be38821b08be62589ac420056bbeea66c74b562882f9ed7eee44db51f6298df653b4aceeab9db874be2aae7462cb28a223e137bc84a4214434b4146d0aec92da07edd58b6aa2fc478aa473ecbbe60418d1db4aa62877d157056883ec1e91359c5392bccf1d40d3a028568b75122af88302ce291f8969bacb5a1b51825562dea8ec911a147c4c09b1b1790086b799e1310aefe6f3133137aa9f333de25f686c4ad334230e3984828c0bbd5ce420bfdf29abb61f2278815da121114f8f375a012103990cc56ef8f4d1c079a3c2e22204aff3b20fb31e48c814c740594affcc64dea11c4f781a4cac76740a20873f4735851123e2ce0b790885991420000000049454e44ae426082</data>
-    </image>
-</images>
-<connections>
-    <connection>
-        <sender>pushButton1</sender>
-        <signal>clicked()</signal>
-        <receiver>batchDialog</receiver>
-        <slot>chooseDir()</slot>
-    </connection>
-    <connection>
-        <sender>pushButton2</sender>
-        <signal>clicked()</signal>
-        <receiver>batchDialog</receiver>
-        <slot>run()</slot>
-    </connection>
-    <connection>
-        <sender>pushButton4</sender>
-        <signal>clicked()</signal>
-        <receiver>batchDialog</receiver>
-        <slot>saveTable()</slot>
-    </connection>
-    <connection>
-        <sender>pushButton5</sender>
-        <signal>clicked()</signal>
-        <receiver>batchDialog</receiver>
-        <slot>openTable()</slot>
-    </connection>
-    <connection>
-        <sender>pushButton5_2</sender>
-        <signal>clicked()</signal>
-        <receiver>batchDialog</receiver>
-        <slot>help()</slot>
-    </connection>
-</connections>
-<slots>
-    <slot>openTable()</slot>
-    <slot>saveTable()</slot>
-    <slot>help()</slot>
-    <slot>run()</slot>
-    <slot>chooseDir()</slot>
-</slots>
-<layoutdefaults spacing="6" margin="11"/>
-</UI>
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>batchDialog</class>
+ <widget class="QDialog" name="batchDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>665</width>
+    <height>294</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Correção Atmosférica para múltiplos arquivos</string>
+  </property>
+  <layout class="QGridLayout">
+   <item row="0" column="0">
+    <layout class="QHBoxLayout">
+     <item>
+      <widget class="QLineEdit" name="lineEdit1"/>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton1">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Abrir Pasta</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="2" column="0">
+    <widget class="QCheckBox" name="waterCheckBox">
+     <property name="text">
+      <string>Aplicar correção de reflexão especular para água</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <layout class="QHBoxLayout">
+     <item>
+      <widget class="QPushButton" name="pushButton4">
+       <property name="text">
+        <string>Salvar tabela</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton5">
+       <property name="text">
+        <string>Carregar tabela</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="spacer1">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Expanding</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>200</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton5_2">
+       <property name="text">
+        <string>Ajuda</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton2">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Processar Imagens</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="1" column="0">
+    <widget class="QTableWidget" name="tableWidget">
+     <column>
+      <property name="text">
+       <string>Arquivo</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Xml</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Atmosfera (modelo)</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Aerosol (modelo)</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Visibilidade (km)</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Altitude (m)</string>
+      </property>
+     </column>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>pushButton1</sender>
+   <signal>clicked()</signal>
+   <receiver>batchDialog</receiver>
+   <slot>chooseDir()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton2</sender>
+   <signal>clicked()</signal>
+   <receiver>batchDialog</receiver>
+   <slot>run()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton4</sender>
+   <signal>clicked()</signal>
+   <receiver>batchDialog</receiver>
+   <slot>saveTable()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton5</sender>
+   <signal>clicked()</signal>
+   <receiver>batchDialog</receiver>
+   <slot>openTable()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton5_2</sender>
+   <signal>clicked()</signal>
+   <receiver>batchDialog</receiver>
+   <slot>help()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
