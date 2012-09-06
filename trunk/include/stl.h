@@ -29,7 +29,7 @@ double toJulian(int day, int month,int year, int hour=0, int minute=0, int secon
 double toJulian(tm dateTime);
 
 //For Each item in a STL container
-#define foreach(m_itname,m_container) \
+#define ForEach(m_itname,m_container) \
     for( typeof(m_container.begin()) m_itname=m_container.begin() ; \
     m_itname!=m_container.end() ; \
     m_itname++ )
