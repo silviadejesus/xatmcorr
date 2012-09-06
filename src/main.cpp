@@ -2,7 +2,7 @@
 //#include "AtmCorr.h"
 
 
-#include <qapplication.h>
+#include <QApplication>
 
 #include <iostream>
 #include <string>
@@ -34,7 +34,8 @@ int main(int argc, char** argv)
             visibility=argv[4];
             heightSeaLevel=atof(argv[5]);
         }
-        DnToToa tool1(a.applicationDirPath().ascii());
+        QString t;
+        DnToToa tool1(a.applicationDirPath().toAscii());
         res =tool1.DnToReflectance(argv[1],atmMode,continental,visibility,heightSeaLevel);
         //QApplication app(argc, argv);
         //AtmCorr foo;
@@ -42,8 +43,8 @@ int main(int argc, char** argv)
         //return app.exec();
     } else {
         
-        batchCor main(a.applicationDirPath().ascii());
-        a.setMainWidget( &main );
+        batchCor main(NULL,a.applicationDirPath());
+        //a.setMainWidget( &main );
         main.show();
         res=a.exec();
         //res=DnToReflectance("C:\Documents and Settings\vatto\Desktop\AtmCorr\LANDSAT_5_TM_19930724_002_066_L2_BAND2.tif");///home/mauriciodev/Projetos/AtmCorr/LANDSAT_5_TM_19930724_002_066_L2_BAND2.tif");
