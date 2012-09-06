@@ -26,7 +26,7 @@ void batchCor::run() {
         visibility=this->tableWidget->itemAt(i,4)->text().toStdString();
         heightSeaLevel=this->tableWidget->itemAt(i,5)->text().toDouble()*-0.001;
 
-        filename=QDir(this->homePath.c_str()).filePath(this->tableWidget->itemAt(i,0)->text()).toStdString();
+        filename=QDir(lineEdit1->text()).filePath(this->tableWidget->itemAt(i,0)->text()).toStdString();
         
         
         //moves to the directory where the file is
@@ -65,7 +65,12 @@ void batchCor::run() {
 }
 
 void batchCor::help() {
-    QMessageBox::information( this, "Application name",    "Estamos sem ajuda.");
+
+    //QMessageBox::information( this, "",    "Estamos sem ajuda.");
+
+    QDir pdfPath(this->homePath.c_str());
+    QString helppdf=pdfPath.filePath("ajuda.pdf");
+    QDesktopServices::openUrl(QUrl("file://" + helppdf));
 }
 
 void batchCor::openTable() {
