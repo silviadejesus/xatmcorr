@@ -158,9 +158,9 @@ bool DnToToa::DnToReflectance(const char* filename, string atmMode, int continen
             newval=c*(a*(pafScanline[i]-auxtable.dnMin) + auxtable.lmin);
             //print(c<<" "<<a<<" "<<newval);
             if (newval<0) newval=0.;
-            if (newval>255) newval=1.;
+            if (newval>100) newval=100.;
 
-            pafWriteline[i]=newval*255;
+            pafWriteline[i]=newval;
         }
         poOutBand->RasterIO( GF_Write, 0, j, nXSize, 1,pafWriteline, nXSize, 1, GDT_Float32,0, 0 );
     }
@@ -213,7 +213,7 @@ bool DnToToa::Correction6S(const char * filename, const char * inpFileName, cons
     for (int j=0;j<nYsize;j++) {
         poBand->RasterIO( GF_Read, 0, j, nXSize, 1,pafScanline, nXSize, 1, GDT_Float32,0, 0 );
         for (int i=0;i<nXSize;i++) {
-            idn=pafScanline[i]/255.;
+            idn=pafScanline[i];
             odn=transform(ti,REFLECTANCE,idn)*100;
             pafWriteline[i]=odn;
         }
@@ -296,13 +296,13 @@ bool DnToToa::copyHeaders (const char * headerPath, const char * newHeader) {
 
 /*!Copies ENVI header and erases temporary file.*/
 bool DnToToa::CleanUp(const char * path, const char * filename, const char * inpFileName, const char *surfFileName) {
-    QDir dirPath(path);
+    //QDir dirPath(path);
 
-    std::string curFile;//="file:";
-    curFile+=path;
-    curFile+=QDir::separator();
+    //std::string curFile;//="file:";
+    //curFile+=path;
+    //curFile+=QDir::separator();
     //erasing .inp
-    std::string inpPath=curFile+inpFileName;
+    //std::string inpPath=curFile+inpFileName;
     //dirPath.remove(inpPath.c_str());
     
     //erasing INPFILES.TXT

@@ -1,7 +1,8 @@
 #include "batchcor.h"
 
-batchCor::batchCor( const char * homePath, QWidget* parent, const char* name, bool modal, WFlags fl ):batchDialog(parent, name, modal, fl) {
-    this->homePath=homePath;
+batchCor::batchCor( QWidget *parent, QString homepath ): QDialog(parent) {
+    setupUi(this);
+    this->homePath=homepath.toStdString();
 }
 
 void batchCor::printText(const char* text) {
@@ -18,23 +19,25 @@ void batchCor::run() {
     //QProcess *proc;
     DnToToa oneImageProcess(this->homePath.c_str());//=new DnToToa();
     int i;
-    for (i=0; i<this->table1->numRows();i++) {
+    for (i=0; i<this->tableWidget->rowCount();i++) {
         //std::cout<<i<<this->table1->numRows()<<std::endl;
-        atmMode=this->table1->text(i,2).ascii();
-        continental=this->table1->text(i,3).toInt();
-        visibility=this->table1->text(i,4).ascii();
-        heightSeaLevel=this->table1->text(i,5).toDouble()*-0.001;
-        filename=this->table1->text(i,0).ascii();
+        atmMode= this->tableWidget->itemAt(i,2)->text().toStdString();
+        continental= this->tableWidget->itemAt(i,3)->text().toInt();
+        visibility=this->tableWidget->itemAt(i,4)->text().toStdString();
+        heightSeaLevel=this->tableWidget->itemAt(i,5)->text().toDouble()*-0.001;
+
+        filename=QDir(this->homePath.c_str()).filePath(this->tableWidget->itemAt(i,0)->text()).toStdString();
         
         
         //moves to the directory where the file is
         QFileInfo fInfo(filename.c_str());
-        std::string local=fInfo.dirPath().ascii();
-        QDir::setCurrent(local.c_str());
-        filename=fInfo.fileName().ascii();
+
+        //std::string local=fInfo.absoluteDir();
+        //QDir::setCurrent(local.c_str());
+        //filename=fInfo.fileName().toStdString();
         //transform to reflectance TOA
         toaFileName=filename;
-        toaFileName.replace(filename.find("."),4,"-toa.tif");
+        toaFileName.replace(filename.find(".tif"),4,"-toa.tif");
         
         if (!oneImageProcess.DnToReflectance(filename.c_str(),atmMode,continental,visibility,heightSeaLevel,toaFileName.c_str())) {
             print("Problems converting to Top of Atmosphere reflectance.");
@@ -52,7 +55,7 @@ void batchCor::run() {
             oneImageProcess.WaterCorrection(waterFileName.c_str(),surfFileName.c_str());
         }
         //convert to tiff and erase files;
-        oneImageProcess.CleanUp(local.c_str(), toaFileName.c_str(),inpFileName.c_str(),surfFileName.c_str());
+        //oneImageProcess.CleanUp(local.c_str(), toaFileName.c_str(),inpFileName.c_str(),surfFileName.c_str());
     }
     QMessageBox::information( this, "XML Atmospheric Correction",
     "Process finished.\n"
@@ -66,22 +69,24 @@ void batchCor::help() {
 }
 
 void batchCor::openTable() {
-    QString dir =QFileDialog::getOpenFileName(".",tr("Comma-separated values files (*.csv)"),this);
-    std::ifstream infile(dir.latin1());
+    QString dir =QFileDialog::getOpenFileName(this,"Abrir tabela",".",tr("Comma-separated values files (*.csv)"));
+    std::ifstream infile(dir.toAscii());
     std::string line;
     char *l;
     QStringList pieces;
-    this->table1->setNumRows(0);
+    this->tableWidget->setRowCount(0);
     int i=0;
     if (infile.is_open()) {
         while (!infile.eof()) {
             getline(infile,line);
             //std::cout<<line<<std::endl;
             if (line!="") {
-                pieces=QStringList::split(",",line);
-                this->table1->insertRows(i);
+                QString s=line.c_str();
+                pieces=s.split(",");
+                this->tableWidget->insertRow(i);
                 for (int j=0;j<(pieces.size()); j++) {
-                    this->table1->setText(i,j,pieces[j]);
+                    QTableWidgetItem *newItem=new QTableWidgetItem(pieces[j]);
+                    this->tableWidget->setItem(i,j,newItem);
                 }
                 
                 //std::cout<<pieces.size()<<std::endl;
@@ -94,12 +99,13 @@ void batchCor::openTable() {
 }
 
 void batchCor::saveTable() {
-    QString dir =QFileDialog::getSaveFileName(".",tr("Comma-separated values files (*.csv)"),this);
-    if (dir.find(".csv")<0) dir.append(".csv");
-    std::ofstream outfile(dir.latin1());
-    for (int i=0;i<table1->numRows();i++) {
-        for (int j=0;j<table1->numCols();j++) {
-            outfile<< table1->text(i,j).ascii()<< ",";
+    QString dir =QFileDialog::getSaveFileName(this,"Salvar tabela como... ",".",tr("Comma-separated values files (*.csv)"));
+    if (dir.indexOf(".csv")<0) dir.append(".csv");
+    std::ofstream outfile(dir.toAscii());
+    for (int i=0;i<tableWidget->rowCount();i++) {
+        for (int j=0;j<tableWidget->columnCount();j++) {
+            outfile<< tableWidget->item(i,j)->text().toStdString()<< ",";
+            //cout<<tableWidget->item(i,j)->text().toStdString()<<endl;
             //compose a line
         }
         outfile<<std::endl;
@@ -108,27 +114,32 @@ void batchCor::saveTable() {
 
 void batchCor::chooseDir() {
     //QString fileFilters = tr("Comma-separated values files (*.csv)\n");
-    if (this->lineEdit1->text()=="") this->lineEdit1->setText(QDir::currentDirPath());
-    QString dir =QFileDialog::getExistingDirectory(this->lineEdit1->text(),this);
+    if (this->lineEdit1->text()=="") this->lineEdit1->setText(QDir::currentPath());
+
+    QString dir =QFileDialog::getExistingDirectory(this,"Abrir diretorio", this->lineEdit1->text());
     //QString fileName = QFileDialog::getOpenFileName(".", fileFilters, this);
     
     if (!dir.isEmpty()) {
         QDir filesDir(dir);
         //list files in the directory
-        QStringList tiffFiles = filesDir.entryList ("*.tif");
+        QDir::Filter f=QDir::Files;
+        QStringList tiffFiles = filesDir.entryList (QStringList("*.tif"),f);
         lineEdit1->setText(dir);
         
         //fills the table
-        table1->setNumRows(tiffFiles.size());
+        tableWidget->setRowCount(tiffFiles.size());
         for ( unsigned int i=0;i<tiffFiles.size();i++ ) {
-            table1->setText(i,0,filesDir.absFilePath(tiffFiles[i]));
+            QTableWidgetItem *newItem = new QTableWidgetItem(filesDir.absoluteFilePath(tiffFiles[i]));
+            tableWidget->setItem(i,0,newItem);
             QString xmlFile=tiffFiles[i];
             xmlFile.replace(".tif",".xml");
+            QTableWidgetItem *newItem2;
             if (filesDir.exists(xmlFile)) {
-                table1->setText(i,1,"Encontrado");
+                newItem2= new QTableWidgetItem("Encontrado");
             } else {
-                table1->setText(i,1,"Nao encontrado");
+                newItem2= new QTableWidgetItem("Nao encontrado");
             }
+            tableWidget->setItem(i,1,newItem2);
         }
     }
 }

@@ -14,7 +14,7 @@ void SensorParam::setTimeStamp(std::string strDate) {
     } else {
         this->timeStamp.setTime(QTime(0,0,0));
     }
-    print(this->timeStamp.toString());
+    print(this->timeStamp.toString().toStdString());
 }
 
 
