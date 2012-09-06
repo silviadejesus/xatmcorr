@@ -1,24 +1,28 @@
-#include "batchDialog.h"
-#include "qfiledialog.h"
-#include "qstring.h"
-#include "qstringlist.h"
-#include "qmessagebox.h"
-#include "qlineedit.h"
-#include "qdir.h"
-#include "qtable.h"
-#include "qfileinfo.h"
-#include "qprocess.h"
-#include "qapplication.h"
-#include "qcheckbox.h"
+#ifndef BATCHCOR_H
+#define BATCHCOR_H
+
+
+#include "ui_batchDialog.h"
+
+#include <QFileDialog>
+#include <QString>
+#include <QStringList>
+#include <QMessageBox>
+#include <QDir>
+//#include "qlineedit.h"
+#include <QTableWidget>
+#include <QFileInfo>
+//#include <QProcess>
+
+//#include "qcheckbox.h"
 
 #include "dntotoa.h"
 
 
-class batchCor: public batchDialog{
+class batchCor: public QDialog, private Ui::batchDialog{
     Q_OBJECT
 public:
-    batchCor(const char * homePath, QWidget* parent = 0, const char* name = 0,
-                    bool modal = FALSE, WFlags fl = 0 );
+    batchCor(QWidget *parent = 0,QString homepath="");
     
 private:
     std::string homePath;
@@ -31,3 +35,5 @@ public slots:
     void printText(const char* text);
     
 };
+
+#endif

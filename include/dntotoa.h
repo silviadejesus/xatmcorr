@@ -6,9 +6,8 @@
 #include "auxtable.h"
 #include "stl.h"
 
-#include "qdatetime.h"
-#include "qprocess.h"
-#include "qurloperator.h" 
+#include <QDateTime>
+#include <QProcess>
 
 #include "6s.h"
 #include "Transform.h"
