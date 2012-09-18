@@ -70,7 +70,12 @@ void batchCor::help() {
 
     QDir pdfPath(this->homePath.c_str());
     QString helppdf=pdfPath.filePath("ajuda.pdf");
-    QDesktopServices::openUrl(QUrl("file://" + helppdf));
+	QUrl helpfile("file:///" + helppdf);
+	
+	if (!QDesktopServices::openUrl(helpfile) ) {
+		QMessageBox::information(this, "XML Atmospheric Correction", "Cannot find help document: \n"+helpfile.toString());
+		string teste=QUrl("file:///C:/Documents and Settings/All Users/Desktop").toString().toAscii();
+	}
 }
 
 void batchCor::openTable() {
