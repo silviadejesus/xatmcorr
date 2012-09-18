@@ -12,6 +12,8 @@
 //#include "qlineedit.h"
 #include <QTableWidget>
 #include <QFileInfo>
+#include <QDesktopServices>
+#include <QUrl>
 //#include <QProcess>
 
 //#include "qcheckbox.h"
