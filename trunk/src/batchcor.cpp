@@ -21,12 +21,12 @@ void batchCor::run() {
     int i;
     for (i=0; i<this->tableWidget->rowCount();i++) {
         //std::cout<<i<<this->table1->numRows()<<std::endl;
-        atmMode= this->tableWidget->itemAt(i,2)->text().toStdString();
-        continental= this->tableWidget->itemAt(i,3)->text().toInt();
-        visibility=this->tableWidget->itemAt(i,4)->text().toStdString();
-        heightSeaLevel=this->tableWidget->itemAt(i,5)->text().toDouble()*-0.001;
+        atmMode= this->tableWidget->item(i,2)->text().toStdString();
+        continental= this->tableWidget->item(i,3)->text().toInt();
+        visibility=this->tableWidget->item(i,4)->text().toStdString();
+        heightSeaLevel=this->tableWidget->item(i,5)->text().toDouble()*-0.001;
 
-        filename=QDir(lineEdit1->text()).filePath(this->tableWidget->itemAt(i,0)->text()).toStdString();
+        filename=QDir(lineEdit1->text()).filePath(this->tableWidget->item(i,0)->text()).toStdString();
         
         
         //moves to the directory where the file is
@@ -74,7 +74,7 @@ void batchCor::help() {
 	
 	if (!QDesktopServices::openUrl(helpfile) ) {
 		QMessageBox::information(this, "XML Atmospheric Correction", "Cannot find help document: \n"+helpfile.toString());
-		string teste=QUrl("file:///C:/Documents and Settings/All Users/Desktop").toString().toAscii();
+        //string teste=QUrl("file:///C:/Documents and Settings/All Users/Desktop").toString().toAscii();
 	}
 }
 
